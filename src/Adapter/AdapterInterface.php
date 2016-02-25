@@ -63,9 +63,10 @@ interface AdapterInterface
     /**
      * Send transaction
      *
+     * @param  boolean $verifyPeer
      * @return void
      */
-    public function send();
+    public function send($verifyPeer = true);
 
     /**
      * Return whether the transaction is a success
