@@ -328,7 +328,7 @@ class Ups extends AbstractAdapter
     public function setDimensions(array $dimensions, $unit = null)
     {
         if ((null !== $unit) && (($unit == 'IN') || ($unit == 'CM'))) {
-            $this->dimensions['UnitOfMeasurement'] = $unit;
+            $this->weight['UnitOfMeasurement'] = $unit;
         }
 
         foreach ($dimensions as $key => $value) {
