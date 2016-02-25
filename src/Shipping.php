@@ -106,13 +106,14 @@ class Shipping
     }
 
     /**
-     * Send transaction data
+     * Send transaction
      *
+     * @param  boolean $verifyPeer
      * @return void
      */
-    public function send()
+    public function send($verifyPeer = true)
     {
-        $this->adapter->send();
+        $this->adapter->send($verifyPeer);
     }
 
     /**
