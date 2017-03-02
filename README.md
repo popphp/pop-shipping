@@ -1,6 +1,10 @@
 pop-shipping
 ============
 
+END OF LIFE
+-----------
+The `pop-shipping` component v2.1.0 is now end-of-life and will no longer be maintained.
+
 [![Build Status](https://travis-ci.org/popphp/pop-shipping.svg?branch=master)](https://travis-ci.org/popphp/pop-shipping)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-shipping)](http://cc.popphp.org/pop-shipping/)
 
