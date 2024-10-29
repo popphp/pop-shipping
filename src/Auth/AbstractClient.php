@@ -106,6 +106,16 @@ abstract class AbstractClient implements ClientInterface
     }
 
     /**
+     * Has token data
+     *
+     * @return bool
+     */
+    public function hasTokenData(): bool
+    {
+        return (!empty($this->tokenData));
+    }
+
+    /**
      * Load token data
      *
      * @param  array $tokenData
@@ -256,15 +266,17 @@ abstract class AbstractClient implements ClientInterface
     /**
      * Authenticate and get auth token
      *
+     * @param  ?string $tokenFile
      * @return AbstractClient
      */
-    abstract public function authenticate(): AbstractClient;
+    abstract public function authenticate(?string $tokenFile = null): AbstractClient;
 
     /**
      * Refresh auth token
      *
+     * @param  ?string $tokenFile
      * @return AbstractClient
      */
-    abstract public function refresh(): AbstractClient;
+    abstract public function refresh(?string $tokenFile = null): AbstractClient;
 
 }

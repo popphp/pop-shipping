@@ -54,9 +54,11 @@ class Client extends AbstractClient
         $client = new Http\Client($authUrl, ['method' => 'POST']);
         $data   = ['grant_type' => 'client_credentials'];
 
+        // UPS Auth
         if ($merchantId !== null) {
             $data['headers'] = ['x-merchant-id' => $merchantId];
             $client->setAuth(Http\Auth::createBasic($clientId, $secret));
+        // FedEx & USPS Auth
         } else {
             $data['client_id']     = $clientId;
             $data['client_secret'] = $secret;
@@ -70,10 +72,11 @@ class Client extends AbstractClient
     /**
      * Authenticate and get auth token
      *
+     * @param  ?string $tokenFile
      * @throws Exception
      * @return Client
      */
-    public function authenticate(): Client
+    public function authenticate(?string $tokenFile = null): Client
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: The auth client does not have an HTTP client.');
@@ -83,6 +86,10 @@ class Client extends AbstractClient
 
         if ($response->isSuccess()) {
             $this->loadTokenData($response->getParsedResponse());
+
+            if (($this->hasTokenData()) && ($tokenFile !== null)) {
+                $this->saveTokenDataToFile($tokenFile);
+            }
         }
         return $this;
     }
@@ -90,15 +97,16 @@ class Client extends AbstractClient
     /**
      * Refresh auth token
      *
+     * @param  ?string $tokenFile
      * @return Client
      */
-    public function refresh(): Client
+    public function refresh(?string $tokenFile = null): Client
     {
         $this->authToken  = null;
         $this->expiration = null;
         $this->tokenData  = [];
 
-        $this->authenticate();
+        $this->authenticate($tokenFile);
 
         return $this;
     }

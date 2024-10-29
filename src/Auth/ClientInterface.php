@@ -59,6 +59,13 @@ interface ClientInterface
     public function getTokenData(?string $key = null): mixed;
 
     /**
+     * Has token data
+     *
+     * @return bool
+     */
+    public function hasTokenData(): bool;
+
+    /**
      * Load token data
      *
      * @param  array $tokenData
@@ -150,15 +157,17 @@ interface ClientInterface
     /**
      * Authenticate and get auth token
      *
+     * @param  ?string $tokenFile
      * @return ClientInterface
      */
-    public function authenticate(): ClientInterface;
+    public function authenticate(?string $tokenFile = null): ClientInterface;
 
     /**
      * Refresh auth token
      *
+     * @param  ?string $tokenFile
      * @return ClientInterface
      */
-    public function refresh(): ClientInterface;
+    public function refresh(?string $tokenFile = null): ClientInterface;
 
 }
