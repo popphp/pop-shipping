@@ -41,6 +41,12 @@ abstract class AbstractClient implements ClientInterface
     protected ?string $authToken = null;
 
     /**
+     * Auth token type
+     * @var ?string
+     */
+    protected ?string $tokenType = null;
+
+    /**
      * Auth token expiration timestamp
      * @var ?int
      */
@@ -85,14 +91,40 @@ abstract class AbstractClient implements ClientInterface
     }
 
     /**
+     * Get token data
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public function getTokenData(?string $key = null): mixed
+    {
+        if ($key !== null) {
+            return $this->tokenData[$key] ?? null;
+        } else {
+            return $this->tokenData;
+        }
+    }
+
+    /**
      * Load token data
      *
      * @param  array $tokenData
      * @return AbstractClient
      */
-    public function loadToken(array $tokenData): AbstractClient
+    public function loadTokenData(array $tokenData): AbstractClient
     {
         $this->tokenData = $tokenData;
+
+        if (!empty($this->tokenData['access_token'])) {
+            $this->authToken = $this->tokenData['access_token'];
+        }
+        if (!empty($this->tokenData['token_type'])) {
+            $this->tokenType = $this->tokenData['token_type'];
+        }
+        if (!empty($this->tokenData['expires_in'])) {
+            $this->expiration = time() + $this->tokenData['expires_in'];
+        }
+
         return $this;
     }
 
@@ -102,10 +134,10 @@ abstract class AbstractClient implements ClientInterface
      * @param  string $tokenFile
      * @return AbstractClient
      */
-    public function loadTokenFromFile(string $tokenFile): AbstractClient
+    public function loadTokenDataFromFile(string $tokenFile): AbstractClient
     {
         if (file_exists($tokenFile)) {
-            $this->tokenData = json_decode(file_get_contents($tokenFile), true);
+            $this->loadTokenData(json_decode(file_get_contents($tokenFile), true));
         }
         return $this;
     }
@@ -114,10 +146,14 @@ abstract class AbstractClient implements ClientInterface
      * Save token data to file
      *
      * @param  string $tokenFile
+     * @param  ?array $tokenData
      * @return ClientInterface
      */
-    public function saveTokenToFile(string $tokenFile): AbstractClient
+    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): AbstractClient
     {
+        if ($tokenData !== null) {
+            $this->loadTokenData($tokenData);
+        }
         file_put_contents($tokenFile, $this->tokenData);
         return $this;
     }
@@ -140,6 +176,41 @@ abstract class AbstractClient implements ClientInterface
     public function getAuthToken(): ?string
     {
         return ($this->hasAuthToken()) ? $this->authToken : null;
+    }
+
+    /**
+     * Fetch auth token, either the current valid one, or get a new/refreshed auth token
+     *
+     * @param  int $buffer    Buffer in seconds to check the expiration
+     * @return ?string
+     */
+    public function fetchAuthToken(int $buffer = 10): ?string
+    {
+        if ((!$this->hasAuthToken()) || ($this->willExpireIn() <= $buffer)) {
+            $this->authenticate();
+        }
+
+        return $this->getAuthToken();
+    }
+
+    /**
+     * Has auth token type
+     *
+     * @return bool
+     */
+    public function hasTokenType(): bool
+    {
+        return ($this->tokenType !== null);
+    }
+
+    /**
+     * Get auth token type
+     *
+     * @return ?string
+     */
+    public function getTokenType(): ?string
+    {
+        return $this->tokenType;
     }
 
     /**

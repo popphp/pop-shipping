@@ -23,4 +23,7 @@ namespace Pop\Shipping\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Usps extends AbstractAdapter {}
+class Usps extends AbstractAdapter
+{
+
+}

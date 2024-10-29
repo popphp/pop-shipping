@@ -51,12 +51,20 @@ interface ClientInterface
     public function hasClient(): bool;
 
     /**
+     * Get token data
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public function getTokenData(?string $key = null): mixed;
+
+    /**
      * Load token data
      *
      * @param  array $tokenData
      * @return ClientInterface
      */
-    public function loadToken(array $tokenData): ClientInterface;
+    public function loadTokenData(array $tokenData): ClientInterface;
 
     /**
      * Load token data from file
@@ -64,15 +72,16 @@ interface ClientInterface
      * @param  string $tokenFile
      * @return ClientInterface
      */
-    public function loadTokenFromFile(string $tokenFile): ClientInterface;
+    public function loadTokenDataFromFile(string $tokenFile): ClientInterface;
 
     /**
      * Save token data to file
      *
      * @param  string $tokenFile
+     * @param  ?array $tokenData
      * @return ClientInterface
      */
-    public function saveTokenToFile(string $tokenFile): ClientInterface;
+    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): ClientInterface;
 
     /**
      * Has valid auth token
@@ -87,6 +96,28 @@ interface ClientInterface
      * @return ?string
      */
     public function getAuthToken(): ?string;
+
+    /**
+     * Fetch auth token, either the current valid one, or get a new/refreshed auth token
+     *
+     * @param  int $buffer    Buffer in seconds to check the expiration
+     * @return ?string
+     */
+    public function fetchAuthToken(int $buffer = 10): ?string;
+
+    /**
+     * Has auth token type
+     *
+     * @return bool
+     */
+    public function hasTokenType(): bool;
+
+    /**
+     * Get auth token type
+     *
+     * @return ?string
+     */
+    public function getTokenType(): ?string;
 
     /**
      * Has auth token expiration

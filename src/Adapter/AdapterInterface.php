@@ -13,6 +13,8 @@
  */
 namespace Pop\Shipping\Adapter;
 
+use Pop\Http\Client;
+
 /**
  * Pop shipping adapter interface
  *
@@ -23,4 +25,29 @@ namespace Pop\Shipping\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-interface AdapterInterface {}
+interface AdapterInterface
+{
+
+    /**
+     * Set the HTTP client
+     *
+     * @param  Client $client
+     * @return AdapterInterface
+     */
+    public function setClient(Client $client): AdapterInterface;
+
+    /**
+     * Get the HTTP client
+     *
+     * @return ?Client
+     */
+    public function getClient(): ?Client;
+
+    /**
+     * Has HTTP client
+     *
+     * @return bool
+     */
+    public function hasClient(): bool;
+
+}

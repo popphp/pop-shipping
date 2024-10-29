@@ -41,9 +41,37 @@ class Client extends AbstractClient
     }
 
     /**
+     * Create auth client
+     *
+     * @param  string  $authUrl
+     * @param  string  $clientId
+     * @param  string  $secret
+     * @param  ?string $merchantId
+     * @return static
+     */
+    public static function createAuthClient(string $authUrl, string $clientId, string $secret, ?string $merchantId = null): static
+    {
+        $client = new Http\Client($authUrl, ['method' => 'POST']);
+        $data   = ['grant_type' => 'client_credentials'];
+
+        if ($merchantId !== null) {
+            $data['headers'] = ['x-merchant-id' => $merchantId];
+            $client->setAuth(Http\Auth::createBasic($clientId, $secret));
+        } else {
+            $data['client_id']     = $clientId;
+            $data['client_secret'] = $secret;
+        }
+
+        $client->setData($data);
+
+        return new static($client);
+    }
+
+    /**
      * Authenticate and get auth token
      *
-     * @return AbstractClient
+     * @throws Exception
+     * @return Client
      */
     public function authenticate(): Client
     {
@@ -54,7 +82,7 @@ class Client extends AbstractClient
         $response = $this->client->send();
 
         if ($response->isSuccess()) {
-            $this->loadToken($response->getParsedResponse());
+            $this->loadTokenData($response->getParsedResponse());
         }
         return $this;
     }
@@ -62,7 +90,7 @@ class Client extends AbstractClient
     /**
      * Refresh auth token
      *
-     * @return AbstractClient
+     * @return Client
      */
     public function refresh(): Client
     {
