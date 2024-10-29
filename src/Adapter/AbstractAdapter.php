@@ -14,6 +14,7 @@
 namespace Pop\Shipping\Adapter;
 
 use Pop\Http;
+use Pop\Shipping\Client\AbstractShippingClient;
 
 /**
  * Pop shipping adapter abstract class
@@ -25,70 +26,105 @@ use Pop\Http;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-abstract class AbstractAdapter implements AdapterInterface
+abstract class AbstractAdapter extends AbstractShippingClient implements AdapterInterface
 {
 
     /**
-     * HTTP client
-     * @var ?Http\Client
+     * Rates API URL
+     * @var ?string
      */
-    protected ?Http\Client $client = null;
+    protected ?string $ratesApiUrl = null;
 
     /**
-     * Constructor
-     *
-     * Instantiate the shipping auth object
+     * Tracking API URL
+     * @var ?string
      */
-    public function __construct(?Http\Client $client = null)
-    {
-        if ($client !== null) {
-            $this->setClient($client);
-        }
-    }
+    protected ?string $trackingApiUrl = null;
 
     /**
      * Create shipping adapter
      *
-     * @param  string  $baseApiUrl
      * @param  string  $authToken
-     * @param  string  $method
+     * @param  bool    $prod
      * @return static
      */
-    public static function createAdapter(string $baseApiUrl, string $authToken, string $method = 'POST'): static
+    public static function createAdapter(string $authToken, bool $prod = false): static
     {
-        return new static(new Http\Client(Http\Auth::createBearer($authToken), ['base_uri' => $baseApiUrl, 'method' => $method]));
+        $adapter = new static();
+        $client  = new Http\Client(
+            Http\Auth::createBearer($authToken),
+            [
+                'base_uri' => (($prod) ? $adapter->getProdApiUrl() : $adapter->getTestApiUrl())
+            ]
+        );
+
+        $adapter->setClient($client);
+
+        return $adapter;
     }
 
     /**
-     * Set the HTTP client
+     * Set rates API URL
      *
-     * @param  Http\Client $client
+     * @param  string $ratesApiUrl
      * @return AbstractAdapter
      */
-    public function setClient(Http\Client $client): AbstractAdapter
+    public function setRatesApiUrl(string $ratesApiUrl): AbstractAdapter
     {
-        $this->client = $client;
+        $this->ratesApiUrl = $ratesApiUrl;
         return $this;
     }
 
     /**
-     * Get the HTTP client
+     * Set tracking API URL
      *
-     * @return ?Http\Client
+     * @param  string $trackingApiUrl
+     * @return AbstractAdapter
      */
-    public function getClient(): ?Http\Client
+    public function setTrackingApiUrl(string $trackingApiUrl): AbstractAdapter
     {
-        return $this->client;
+        $this->trackingApiUrl = $trackingApiUrl;
+        return $this;
     }
 
     /**
-     * Has HTTP client
+     * Get rates API URL
+     *
+     * @return ?string
+     */
+    public function getRatesApiUrl(): ?string
+    {
+        return $this->ratesApiUrl;
+    }
+
+    /**
+     * Get tracking API URL
+     *
+     * @return ?string
+     */
+    public function getTrackingApiUrl(): ?string
+    {
+        return $this->trackingApiUrl;
+    }
+
+    /**
+     * Has rates API URL
      *
      * @return bool
      */
-    public function hasClient(): bool
+    public function hasRatesApiUrl(): bool
     {
-        return ($this->client !== null);
+        return !empty($this->ratesApiUrl);
+    }
+
+    /**
+     * Has tracking API URL
+     *
+     * @return bool
+     */
+    public function hasTrackingApiUrl(): bool
+    {
+        return !empty($this->trackingApiUrl);
     }
 
 }

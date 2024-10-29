@@ -13,8 +13,6 @@
  */
 namespace Pop\Shipping\Auth;
 
-use Pop\Http\Client;
-
 /**
  * Pop shipping auth client interface
  *
@@ -25,30 +23,8 @@ use Pop\Http\Client;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-interface ClientInterface
+interface AuthClientInterface
 {
-
-    /**
-     * Set the HTTP client
-     *
-     * @param  Client $client
-     * @return ClientInterface
-     */
-    public function setClient(Client $client): ClientInterface;
-
-    /**
-     * Get the HTTP client
-     *
-     * @return ?Client
-     */
-    public function getClient(): ?Client;
-
-    /**
-     * Has HTTP client
-     *
-     * @return bool
-     */
-    public function hasClient(): bool;
 
     /**
      * Get token data
@@ -69,26 +45,26 @@ interface ClientInterface
      * Load token data
      *
      * @param  array $tokenData
-     * @return ClientInterface
+     * @return AuthClientInterface
      */
-    public function loadTokenData(array $tokenData): ClientInterface;
+    public function loadTokenData(array $tokenData): AuthClientInterface;
 
     /**
      * Load token data from file
      *
      * @param  string $tokenFile
-     * @return ClientInterface
+     * @return AuthClientInterface
      */
-    public function loadTokenDataFromFile(string $tokenFile): ClientInterface;
+    public function loadTokenDataFromFile(string $tokenFile): AuthClientInterface;
 
     /**
      * Save token data to file
      *
      * @param  string $tokenFile
      * @param  ?array $tokenData
-     * @return ClientInterface
+     * @return AuthClientInterface
      */
-    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): ClientInterface;
+    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): AuthClientInterface;
 
     /**
      * Has valid auth token
@@ -158,16 +134,16 @@ interface ClientInterface
      * Authenticate and get auth token
      *
      * @param  ?string $tokenFile
-     * @return ClientInterface
+     * @return AuthClientInterface
      */
-    public function authenticate(?string $tokenFile = null): ClientInterface;
+    public function authenticate(?string $tokenFile = null): AuthClientInterface;
 
     /**
      * Refresh auth token
      *
      * @param  ?string $tokenFile
-     * @return ClientInterface
+     * @return AuthClientInterface
      */
-    public function refresh(?string $tokenFile = null): ClientInterface;
+    public function refresh(?string $tokenFile = null): AuthClientInterface;
 
 }

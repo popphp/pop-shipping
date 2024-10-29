@@ -13,7 +13,7 @@
  */
 namespace Pop\Shipping\Auth;
 
-use Pop\Http\Client;
+use Pop\Shipping\Client\AbstractShippingClient;
 
 /**
  * Pop shipping auth abstract client class
@@ -25,14 +25,14 @@ use Pop\Http\Client;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-abstract class AbstractClient implements ClientInterface
+abstract class AbstractAuthClient extends AbstractShippingClient implements AuthClientInterface
 {
 
     /**
-     * HTTP client
-     * @var ?Client
+     * Auth API URL
+     * @var ?string
      */
-    protected ?Client $client = null;
+    protected ?string $authApiUrl = null;
 
     /**
      * Auth token
@@ -59,35 +59,35 @@ abstract class AbstractClient implements ClientInterface
     protected array $tokenData = [];
 
     /**
-     * Set the HTTP client
+     * Set auth API URL
      *
-     * @param  Client $client
-     * @return AbstractClient
+     * @param  string $authApiUrl
+     * @return AbstractAuthClient
      */
-    public function setClient(Client $client): AbstractClient
+    public function setAuthApiUrl(string $authApiUrl): AbstractAuthClient
     {
-        $this->client = $client;
+        $this->authApiUrl = $authApiUrl;
         return $this;
     }
 
     /**
-     * Get the HTTP client
+     * Get auth API URL
      *
-     * @return ?Client
+     * @return ?string
      */
-    public function getClient(): ?Client
+    public function getAuthApiUrl(): ?string
     {
-        return $this->client;
+        return $this->authApiUrl;
     }
 
     /**
-     * Has HTTP client
+     * Has auth API URL
      *
      * @return bool
      */
-    public function hasClient(): bool
+    public function hasAuthApiUrl(): bool
     {
-        return ($this->client !== null);
+        return !empty($this->authApiUrl);
     }
 
     /**
@@ -119,9 +119,9 @@ abstract class AbstractClient implements ClientInterface
      * Load token data
      *
      * @param  array $tokenData
-     * @return AbstractClient
+     * @return AbstractAuthClient
      */
-    public function loadTokenData(array $tokenData): AbstractClient
+    public function loadTokenData(array $tokenData): AbstractAuthClient
     {
         $this->tokenData = $tokenData;
 
@@ -142,9 +142,9 @@ abstract class AbstractClient implements ClientInterface
      * Load token data from file
      *
      * @param  string $tokenFile
-     * @return AbstractClient
+     * @return AbstractAuthClient
      */
-    public function loadTokenDataFromFile(string $tokenFile): AbstractClient
+    public function loadTokenDataFromFile(string $tokenFile): AbstractAuthClient
     {
         if (file_exists($tokenFile)) {
             $this->loadTokenData(json_decode(file_get_contents($tokenFile), true));
@@ -157,9 +157,9 @@ abstract class AbstractClient implements ClientInterface
      *
      * @param  string $tokenFile
      * @param  ?array $tokenData
-     * @return ClientInterface
+     * @return AbstractAuthClient
      */
-    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): AbstractClient
+    public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): AbstractAuthClient
     {
         if ($tokenData !== null) {
             $this->loadTokenData($tokenData);
@@ -191,13 +191,14 @@ abstract class AbstractClient implements ClientInterface
     /**
      * Fetch auth token, either the current valid one, or get a new/refreshed auth token
      *
-     * @param  int $buffer    Buffer in seconds to check the expiration
+     * @param  int     $buffer    Buffer in seconds to check the expiration
+     * @param  ?string $tokenFile
      * @return ?string
      */
-    public function fetchAuthToken(int $buffer = 10): ?string
+    public function fetchAuthToken(int $buffer = 10, ?string $tokenFile = null): ?string
     {
         if ((!$this->hasAuthToken()) || ($this->willExpireIn() <= $buffer)) {
-            $this->authenticate();
+            $this->authenticate($tokenFile);
         }
 
         return $this->getAuthToken();
@@ -267,16 +268,42 @@ abstract class AbstractClient implements ClientInterface
      * Authenticate and get auth token
      *
      * @param  ?string $tokenFile
-     * @return AbstractClient
+     * @throws Exception
+     * @return AbstractAuthClient
      */
-    abstract public function authenticate(?string $tokenFile = null): AbstractClient;
+    public function authenticate(?string $tokenFile = null): AbstractAuthClient
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: The auth client does not have an HTTP client.');
+        }
+
+        $response = $this->client->send($this->authApiUrl);
+
+        if ($response->isSuccess()) {
+            $this->loadTokenData($response->getParsedResponse());
+
+            if (($this->hasTokenData()) && ($tokenFile !== null)) {
+                $this->saveTokenDataToFile($tokenFile);
+            }
+        }
+        return $this;
+    }
 
     /**
      * Refresh auth token
      *
      * @param  ?string $tokenFile
-     * @return AbstractClient
+     * @return AbstractAuthClient
      */
-    abstract public function refresh(?string $tokenFile = null): AbstractClient;
+    public function refresh(?string $tokenFile = null): AbstractAuthClient
+    {
+        $this->authToken  = null;
+        $this->expiration = null;
+        $this->tokenData  = [];
+
+        $this->authenticate($tokenFile);
+
+        return $this;
+    }
 
 }

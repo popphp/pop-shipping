@@ -29,25 +29,47 @@ interface AdapterInterface
 {
 
     /**
-     * Set the HTTP client
+     * Set rates API URL
      *
-     * @param  Client $client
+     * @param  string $ratesApiUrl
      * @return AdapterInterface
      */
-    public function setClient(Client $client): AdapterInterface;
+    public function setRatesApiUrl(string $ratesApiUrl): AdapterInterface;
 
     /**
-     * Get the HTTP client
+     * Set tracking API URL
      *
-     * @return ?Client
+     * @param  string $trackingApiUrl
+     * @return AdapterInterface
      */
-    public function getClient(): ?Client;
+    public function setTrackingApiUrl(string $trackingApiUrl): AdapterInterface;
 
     /**
-     * Has HTTP client
+     * Get rates API URL
+     *
+     * @return ?string
+     */
+    public function getRatesApiUrl(): ?string;
+
+    /**
+     * Get tracking API URL
+     *
+     * @return ?string
+     */
+    public function getTrackingApiUrl(): ?string;
+
+    /**
+     * Has rates API URL
      *
      * @return bool
      */
-    public function hasClient(): bool;
+    public function hasRatesApiUrl(): bool;
+
+    /**
+     * Has tracking API URL
+     *
+     * @return bool
+     */
+    public function hasTrackingApiUrl(): bool;
 
 }

@@ -11,8 +11,9 @@
 /**
  * @namespace
  */
-namespace Pop\Shipping\Adapter;
+namespace Pop\Shipping\Auth;
 
+use Pop\Http;
 use Pop\Shipping\Client\AbstractShippingClient;
 
 /**
@@ -25,7 +26,7 @@ use Pop\Shipping\Client\AbstractShippingClient;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Ups extends AbstractAdapter
+class Ups extends AbstractAuthClient
 {
 
     /**
@@ -41,15 +42,35 @@ class Ups extends AbstractAdapter
     protected ?string $testApiUrl = AbstractShippingClient::UPS_TEST_API_URL;
 
     /**
-     * Rates API URL
+     * Auth API URL
      * @var ?string
      */
-    protected ?string $ratesApiUrl = '/api/rating/v2403/Rate'; // POST
+    protected ?string $authApiUrl = '/security/v1/oauth/token'; // POST
 
     /**
-     * Tracking API URL
-     * @var ?string
+     * Create auth client
+     *
+     * @param  string $clientId
+     * @param  string $secret
+     * @param  string $merchantId
+     * @param  bool   $prod
+     * @return static
      */
-    protected ?string $trackingApiUrl = '/api/track/v1/details/'; // GET - requires the tracking number to be appended to the URL
+    public static function createAuthClient(string $clientId, string $secret, string $merchantId, bool $prod = false): static
+    {
+        $authClient = new static();
+        $client     = new Http\Client(Http\Auth::createBasic($clientId, $secret), [
+            'base_uri' => ($prod) ? $authClient->getProdApiUrl() : $authClient->getTestApiUrl(),
+            'method'   => 'POST',
+            'headers'  => ['x-merchant-id' => $merchantId],
+            'data'     => [
+                'grant_type'    => 'client_credentials'
+            ]
+        ]);
+
+        $authClient->setClient($client);
+
+        return $authClient;
+    }
 
 }
