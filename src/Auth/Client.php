@@ -13,6 +13,8 @@
  */
 namespace Pop\Shipping\Auth;
 
+use Pop\Http;
+
 /**
  * Pop shipping auth client class
  *
@@ -23,4 +25,54 @@ namespace Pop\Shipping\Auth;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Client extends AbstractClient {}
+class Client extends AbstractClient
+{
+
+    /**
+     * Constructor
+     *
+     * Instantiate the shipping auth object
+     */
+    public function __construct(?Http\Client $client = null)
+    {
+        if ($client !== null) {
+            $this->setClient($client);
+        }
+    }
+
+    /**
+     * Authenticate and get auth token
+     *
+     * @return AbstractClient
+     */
+    public function authenticate(): Client
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: The auth client does not have an HTTP client.');
+        }
+
+        $response = $this->client->send();
+
+        if ($response->isSuccess()) {
+            $this->loadToken($response->getParsedResponse());
+        }
+        return $this;
+    }
+
+    /**
+     * Refresh auth token
+     *
+     * @return AbstractClient
+     */
+    public function refresh(): Client
+    {
+        $this->authToken  = null;
+        $this->expiration = null;
+        $this->tokenData  = [];
+
+        $this->authenticate();
+
+        return $this;
+    }
+
+}
