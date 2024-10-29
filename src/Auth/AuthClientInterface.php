@@ -67,6 +67,14 @@ interface AuthClientInterface
     public function saveTokenDataToFile(string $tokenFile, ?array $tokenData = null): AuthClientInterface;
 
     /**
+     * Has token data file
+     *
+     * @param  string $tokenFile
+     * @return bool
+     */
+    public function hasTokenDataFile(string $tokenFile): bool;
+
+    /**
      * Has valid auth token
      *
      * @return bool
@@ -83,10 +91,11 @@ interface AuthClientInterface
     /**
      * Fetch auth token, either the current valid one, or get a new/refreshed auth token
      *
-     * @param  int $buffer    Buffer in seconds to check the expiration
+     * @param  ?string $tokenFile
+     * @param  int     $buffer     Buffer in seconds to check the expiration
      * @return ?string
      */
-    public function fetchAuthToken(int $buffer = 10): ?string;
+    public function fetchAuthToken(?string $tokenFile = null, int $buffer = 10): ?string;
 
     /**
      * Has auth token type

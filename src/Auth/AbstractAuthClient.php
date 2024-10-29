@@ -133,6 +133,8 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
         }
         if (!empty($this->tokenData['expires_in'])) {
             $this->expiration = time() + $this->tokenData['expires_in'];
+        } else if (!empty($this->tokenData['expiration'])) {
+            $this->expiration = $this->tokenData['expiration'];
         }
 
         return $this;
@@ -164,8 +166,24 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
         if ($tokenData !== null) {
             $this->loadTokenData($tokenData);
         }
-        file_put_contents($tokenFile, $this->tokenData);
+        file_put_contents($tokenFile, json_encode([
+            'access_token' => $this->tokenData['access_token'],
+            'token_type'   => $this->tokenData['token_type'],
+            'expiration'   => $this->expiration
+        ], JSON_PRETTY_PRINT));
+
         return $this;
+    }
+
+    /**
+     * Has token data file
+     *
+     * @param  string $tokenFile
+     * @return bool
+     */
+    public function hasTokenDataFile(string $tokenFile): bool
+    {
+        return (file_exists($tokenFile));
     }
 
     /**
@@ -191,12 +209,15 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
     /**
      * Fetch auth token, either the current valid one, or get a new/refreshed auth token
      *
-     * @param  int     $buffer    Buffer in seconds to check the expiration
      * @param  ?string $tokenFile
+     * @param  int     $buffer     Buffer in seconds to check the expiration
      * @return ?string
      */
-    public function fetchAuthToken(int $buffer = 10, ?string $tokenFile = null): ?string
+    public function fetchAuthToken(?string $tokenFile = null, int $buffer = 10): ?string
     {
+        if ((!$this->hasAuthToken()) && ($tokenFile !== null)) {
+            $this->loadTokenDataFromFile($tokenFile);
+        }
         if ((!$this->hasAuthToken()) || ($this->willExpireIn() <= $buffer)) {
             $this->authenticate($tokenFile);
         }
