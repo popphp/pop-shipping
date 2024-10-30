@@ -45,6 +45,12 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     protected ?Http\Client $client = null;
 
     /**
+     * Is produciton flag
+     * @var bool
+     */
+    protected bool $isProd = false;
+
+    /**
      * Production API URL
      * @var ?string
      */
@@ -98,6 +104,28 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     public function hasClient(): bool
     {
         return ($this->client !== null);
+    }
+
+    /**
+     * Set as production
+     *
+     * @param  bool $prod
+     * @return AbstractShippingClient
+     */
+    public function setProduction(bool $prod): AbstractShippingClient
+    {
+        $this->isProd = $prod;
+        return $this;
+    }
+
+    /**
+     * Is production
+     *
+     * @return bool
+     */
+    public function isProduction(): bool
+    {
+        return $this->isProd;
     }
 
     /**

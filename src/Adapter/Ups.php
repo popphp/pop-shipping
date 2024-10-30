@@ -52,4 +52,65 @@ class Ups extends AbstractAdapter
      */
     protected ?string $trackingApiUrl = '/api/track/v1/details/'; // GET - requires the tracking number to be appended to the URL
 
+    /**
+     * Get rates
+     *
+     * @throws Exception
+     * @return Ups
+     */
+    public function getRates(): Ups
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get tracking
+     *
+     * @param  string|array|null $trackingNumbers
+     * @throws Exception
+     * @return Ups
+     */
+    public function getTracking(string|array|null $trackingNumbers = null): Ups
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+        if ($trackingNumbers !== null) {
+            if (is_array($trackingNumbers)) {
+                $this->addTrackingNumbers($trackingNumbers);
+            } else {
+                $this->addTrackingNumber($trackingNumbers);
+            }
+        }
+
+        if (!$this->hasTrackingNumbers()) {
+            throw new Exception('Error: No tracking numbers have been passed.');
+        }
+
+        $responses   = [];
+        $transSource = $this->isProd ? $this->userAgent : 'testing';
+
+        $this->client->reset();
+        $this->client->addHeader('transId', uniqid())
+            ->addHeader('transactionSrc', $transSource);
+
+        foreach ($this->trackingNumbers as $trackingNumber) {
+            $response = $this->client->get($this->trackingApiUrl . $trackingNumber);
+            if ($response->isSuccess()) {
+                $responses[] = $response->getParsedResponse();
+            }
+            $this->client->reset();
+        }
+
+        if (!empty($responses)) {
+            $this->response = $responses;
+        }
+
+        return $this;
+    }
+
 }

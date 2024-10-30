@@ -52,4 +52,60 @@ class Usps extends AbstractAdapter
      */
     protected ?string $trackingApiUrl = '/tracking/v3/tracking/'; // GET - requires the tracking number to be appended to the URL
 
+    /**
+     * Get rates
+     *
+     * @throws Exception
+     * @return Usps
+     */
+    public function getRates(): Usps
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get tracking
+     *
+     * @param  string|array|null $trackingNumbers
+     * @throws Exception
+     * @return Usps
+     */
+    public function getTracking(string|array|null $trackingNumbers = null): Usps
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+        if ($trackingNumbers !== null) {
+            if (is_array($trackingNumbers)) {
+                $this->addTrackingNumbers($trackingNumbers);
+            } else {
+                $this->addTrackingNumber($trackingNumbers);
+            }
+        }
+
+        if (!$this->hasTrackingNumbers()) {
+            throw new Exception('Error: No tracking numbers have been passed.');
+        }
+
+        $responses = [];
+
+        foreach ($this->trackingNumbers as $trackingNumber) {
+            $response = $this->client->get($this->trackingApiUrl . $trackingNumber);
+            if ($response->isSuccess()) {
+                $responses[] = $response->getParsedResponse();
+            }
+            $this->client->reset();
+        }
+
+        if (!empty($responses)) {
+            $this->response = $responses;
+        }
+
+        return $this;
+    }
+
 }

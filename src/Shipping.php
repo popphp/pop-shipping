@@ -27,28 +27,10 @@ class Shipping
 {
 
     /**
-     * Shipping Auth Client
-     * @var ?Auth\Client
-     */
-    protected ?Auth\Client $authClient = null;
-
-    /**
      * Shipping Adapter
      * @var ?Adapter\AbstractAdapter
      */
     protected ?Adapter\AbstractAdapter $adapter = null;
-
-    /**
-     * Shipping packages
-     * @var Package[]
-     */
-    protected array $packages = [];
-
-    /**
-     * Shipping tracking numbers
-     * @var array
-     */
-    protected array $trackingNumbers = [];
 
     /**
      * Constructor
@@ -60,18 +42,16 @@ class Shipping
     {
         $args = func_get_args();
 
-        foreach ($args as $i => $arg) {
-            if ($arg instanceof \Pop\Shipping\Auth\Client) {
-                $this->setAuthClient($arg);
-            } else if ($arg instanceof \Pop\Shipping\Adapter\AbstractAdapter) {
+        foreach ($args as $arg) {
+            if ($arg instanceof Adapter\AbstractAdapter) {
                 $this->setAdapter($arg);
-            } else if ($arg instanceof \Pop\Shipping\Package) {
+            } else if ($arg instanceof Package) {
                 $this->addPackage($arg);
             } else  if (is_string($arg)) {
                 $this->addTrackingNumber($arg);
             } else if (is_array($arg)) {
                 foreach ($arg as $a) {
-                    if ($a instanceof \Pop\Shipping\Package) {
+                    if ($a instanceof Package) {
                         $this->addPackage($a);
                     } else if (is_string($a)) {
                         $this->addTrackingNumber($a);
@@ -79,38 +59,6 @@ class Shipping
                 }
             }
         }
-    }
-
-    /**
-     * Set shipping auth client
-     *
-     * @param  Auth\Client $authClient
-     * @return Shipping
-     */
-    public function setAuthClient(Auth\Client $authClient): Shipping
-    {
-        $this->authClient = $authClient;
-        return $this;
-    }
-
-    /**
-     * Get shipping auth client
-     *
-     * @return Auth\Client
-     */
-    public function getAuthClient(): Auth\Client
-    {
-        return $this->authClient;
-    }
-
-    /**
-     * Has shipping auth client
-     *
-     * @return bool
-     */
-    public function hasAuthClient(): bool
-    {
-        return (!empty($this->authClient));
     }
 
     /**
@@ -153,9 +101,7 @@ class Shipping
      */
     public function addPackages(array $packages): Shipping
     {
-        foreach ($packages as $package) {
-            $this->addPackage($package);
-        }
+        $this->adapter?->addPackages($packages);
         return $this;
     }
 
@@ -167,10 +113,7 @@ class Shipping
      */
     public function addPackage(Package $package): Shipping
     {
-        if (!$package->hasId()) {
-            $package->setId(uniqid());
-        }
-        $this->packages[$package->getId()] = $package;
+        $this->adapter?->addPackage($package);
         return $this;
     }
 
@@ -181,7 +124,7 @@ class Shipping
      */
     public function getPackages(): array
     {
-        return $this->packages;
+        return $this->adapter?->getPackages();
     }
 
     /**
@@ -192,7 +135,7 @@ class Shipping
      */
     public function getPackage(mixed $id): ?Package
     {
-        return $this->packages[$id] ?? null;
+        return $this->adapter?->getPackage($id);
     }
 
     /**
@@ -202,7 +145,7 @@ class Shipping
      */
     public function hasPackages(): bool
     {
-        return (!empty($this->packages));
+        return $this->adapter?->hasPackages();
     }
 
     /**
@@ -213,7 +156,7 @@ class Shipping
      */
     public function hasPackage(mixed $id): bool
     {
-        return (isset($this->packages[$id]));
+        return $this->adapter?->hasPackage($id);
     }
 
     /**
@@ -224,9 +167,7 @@ class Shipping
      */
     public function addTrackingNumbers(array $trackingNumbers): Shipping
     {
-        foreach ($trackingNumbers as $trackingNumber) {
-            $this->addTrackingNumber($trackingNumber);
-        }
+        $this->adapter?->addTrackingNumbers($trackingNumbers);
         return $this;
     }
 
@@ -238,9 +179,7 @@ class Shipping
      */
     public function addTrackingNumber(string $trackingNumber): Shipping
     {
-        if (!in_array($trackingNumber, $this->trackingNumbers)) {
-            $this->trackingNumbers[] = $trackingNumber;
-        }
+        $this->adapter?->addTrackingNumber($trackingNumber);
         return $this;
     }
 
@@ -251,7 +190,7 @@ class Shipping
      */
     public function getTrackingNumbers(): array
     {
-        return $this->trackingNumbers;
+        return $this->adapter?->getTrackingNumbers();
     }
 
     /**
@@ -261,7 +200,7 @@ class Shipping
      */
     public function hasTrackingNumbers(): bool
     {
-        return (!empty($this->trackingNumbers));
+        return $this->adapter?->hasTrackingNumbers();
     }
 
     /**
@@ -272,7 +211,114 @@ class Shipping
      */
     public function hasTrackingNumber(string $trackingNumber): bool
     {
-        return (in_array($trackingNumber, $this->trackingNumbers));
+        return $this->adapter?->hasTrackingNumber($trackingNumber);
+    }
+
+    /**
+     * Set ship to
+     *
+     * @param  array $shipTo
+     * @return Shipping
+     */
+    public function setShipTo(array $shipTo): Shipping
+    {
+        $this->adapter?->setShipTo($shipTo);
+        return $this;
+    }
+
+    /**
+     * Get ship to
+     *
+     * @return array
+     */
+    public function getShipTo(): array
+    {
+        return $this->adapter?->getShipTo();
+    }
+
+    /**
+     * Has ship to
+     *
+     * @return bool
+     */
+    public function hasShipTo(): bool
+    {
+        return $this->adapter?->hasShipTo();
+    }
+
+    /**
+     * Set ship from
+     *
+     * @param  array $shipFrom
+     * @return Shipping
+     */
+    public function setShipFrom(array $shipFrom): Shipping
+    {
+        $this->adapter?->setShipFrom($shipFrom);
+        return $this;
+    }
+
+    /**
+     * Get ship from
+     *
+     * @return array
+     */
+    public function getShipFrom(): array
+    {
+        return $this->adapter?->getShipFrom();
+    }
+
+    /**
+     * Has ship from
+     *
+     * @return bool
+     */
+    public function hasShipFrom(): bool
+    {
+        return $this->adapter?->hasShipFrom();
+    }
+
+    /**
+     * Get response
+     *
+     * @return mixed
+     */
+    public function getResponse(): mixed
+    {
+        return $this->adapter?->getResponse();
+    }
+
+    /**
+     * Has response
+     *
+     * @return bool
+     */
+    public function hasResponse(): bool
+    {
+        return $this->adapter?->hasResponse();
+    }
+
+    /**
+     * Get rates
+     *
+     * @return Shipping
+     */
+    public function getRates(): Shipping
+    {
+        $this->adapter?->getRates();
+        return $this;
+    }
+
+    /**
+     * Get tracking
+     *
+     * @param  string|array|null $trackingNumbers
+     * @return Shipping
+     */
+    public function getTracking(string|array|null $trackingNumbers = null): Shipping
+    {
+        $this->adapter?->getTracking($trackingNumbers);
+        return $this;
     }
 
 }

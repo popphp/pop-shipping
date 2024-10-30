@@ -50,6 +50,69 @@ class Fedex extends AbstractAdapter
      * Tracking API URL
      * @var ?string
      */
-    protected ?string $trackingApiUrl = '/track/v1/associatedshipments'; // POST
+    protected ?string $trackingApiUrl = '/track/v1/trackingnumbers'; // POST
+
+    /**
+     * Get rates
+     *
+     * @throws Exception
+     * @return Fedex
+     */
+    public function getRates(): Fedex
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get tracking
+     *
+     * @param  string|array|null $trackingNumbers
+     * @throws Exception
+     * @return Fedex
+     */
+    public function getTracking(string|array|null $trackingNumbers = null): Fedex
+    {
+        if (!$this->hasClient()) {
+            throw new Exception('Error: There is no HTTP client for this shipping adapter.');
+        }
+        if ($trackingNumbers !== null) {
+            if (is_array($trackingNumbers)) {
+                $this->addTrackingNumbers($trackingNumbers);
+            } else {
+                $this->addTrackingNumber($trackingNumbers);
+            }
+        }
+
+        if (!$this->hasTrackingNumbers()) {
+            throw new Exception('Error: No tracking numbers have been passed.');
+        }
+
+        $data = [
+            'includeDetailedScans' => true,
+            'trackingInfo'         => []
+        ];
+
+        foreach ($this->trackingNumbers as $trackingNumber) {
+            $data['trackingInfo'][] = [
+                'trackingNumberInfo' => [
+                    'trackingNumber' => $trackingNumber
+                ]
+            ];
+        }
+
+        $this->client->reset()->setData($data);
+
+        $response = $this->client->post($this->trackingApiUrl);
+
+        if ($response->isSuccess()) {
+            $this->response = $response->getParsedResponse();
+        }
+
+        return $this;
+    }
 
 }
