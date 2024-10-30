@@ -93,11 +93,10 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
         $client = new Http\Client(
             Http\Auth::createBearer($authToken),
             [
-                'base_uri' => (($prod) ? $adapter->getProdApiUrl() : $adapter->getTestApiUrl()),
+                'base_uri' => $adapter->getApiUrl(),
                 'type'     => 'application/json'
             ]
         );
-        $client->setType('application/json');
 
         $adapter->setClient($client);
 
@@ -416,16 +415,24 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Get rates
      *
-     * @return AbstractAdapter
+     * @return mixed
      */
-    abstract public function getRates(): AbstractAdapter;
+    abstract public function getRates(): mixed;
 
     /**
      * Get tracking
      *
      * @param  string|array|null $trackingNumbers
-     * @return AbstractAdapter
+     * @return mixed
      */
-    abstract public function getTracking(string|array|null $trackingNumbers = null): AbstractAdapter;
+    abstract public function getTracking(string|array|null $trackingNumbers = null): mixed;
+
+    /**
+     * Validate address
+     *
+     * @param  mixed $address
+     * @return mixed
+     */
+    abstract public function validateAddress(mixed $address = null): mixed;
 
 }

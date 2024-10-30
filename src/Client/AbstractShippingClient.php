@@ -107,6 +107,16 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     }
 
     /**
+     * Get API URL
+     *
+     * @return ?string
+     */
+    public function getApiUrl(): ?string
+    {
+        return ($this->isProduction()) ? $this->prodApiUrl : $this->testApiUrl;
+    }
+
+    /**
      * Set as production
      *
      * @param  bool $prod

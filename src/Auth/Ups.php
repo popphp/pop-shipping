@@ -62,7 +62,7 @@ class Ups extends AbstractAuthClient
         $authClient->setProduction($prod);
 
         $client = new Http\Client(Http\Auth::createBasic($clientId, $secret), [
-            'base_uri' => ($prod) ? $authClient->getProdApiUrl() : $authClient->getTestApiUrl(),
+            'base_uri' => $authClient->getApiUrl(),
             'method'   => 'POST',
             'headers'  => ['x-merchant-id' => $merchantId],
             'data'     => [

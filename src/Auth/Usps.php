@@ -61,7 +61,7 @@ class Usps extends AbstractAuthClient
         $authClient->setProduction($prod);
 
         $client = new Http\Client([
-            'base_uri' => ($prod) ? $authClient->getProdApiUrl() : $authClient->getTestApiUrl(),
+            'base_uri' => $authClient->getApiUrl(),
             'method' => 'POST',
             'data'   => [
                 'grant_type'    => 'client_credentials',

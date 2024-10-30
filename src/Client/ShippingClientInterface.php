@@ -51,6 +51,28 @@ interface ShippingClientInterface
     public function hasClient(): bool;
 
     /**
+     * Get API URL
+     *
+     * @return ?string
+     */
+    public function getApiUrl(): ?string;
+
+    /**
+     * Set as production
+     *
+     * @param  bool $prod
+     * @return AbstractShippingClient
+     */
+    public function setProduction(bool $prod): ShippingClientInterface;
+
+    /**
+     * Is production
+     *
+     * @return bool
+     */
+    public function isProduction(): bool;
+
+    /**
      * Set production API URL
      *
      * @param  string $prodApiUrl

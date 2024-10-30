@@ -56,13 +56,17 @@ class Fedex extends AbstractAdapter
      * Get rates
      *
      * @throws Exception
-     * @return Fedex
+     * @return mixed
      */
-    public function getRates(): Fedex
+    public function getRates(): mixed
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
         }
+
+        /**
+         * TO-DO
+         */
 
         return $this;
     }
@@ -72,9 +76,9 @@ class Fedex extends AbstractAdapter
      *
      * @param  string|array|null $trackingNumbers
      * @throws Exception
-     * @return Fedex
+     * @return mixed
      */
-    public function getTracking(string|array|null $trackingNumbers = null): Fedex
+    public function getTracking(string|array|null $trackingNumbers = null): mixed
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -111,6 +115,39 @@ class Fedex extends AbstractAdapter
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
         }
+
+        return $this;
+    }
+
+    /**
+     * Validate address
+     *
+     * @param  mixed $address  An array of address data or a string with containing "from" to indicate
+     *                         using the ship-from address. If empty, will default to the ship-to address
+     * @throws Exception
+     * @return mixed
+     */
+    public function validateAddress(mixed $address = null): mixed
+    {
+        if ($address !== null) {
+            // Use the ship-from address
+            if (is_string($address) && str_contains(strtolower($address), 'from') && !empty($this->shipFrom)) {
+                $address = $this->shipFrom;
+            // Else, check that the address is an array of address data
+            } else if (!is_array($address)) {
+                throw new Exception('Error: The provided address must be an array of address data.');
+            }
+        } else if (!empty($this->shipTo)) {
+            $address = $this->shipTo;
+        }
+
+        if (empty($address) && empty($this->shipTo) && empty($this->shipFrom)) {
+            throw new Exception('Error: There is no ship-to or ship-from address and no other address was provided.');
+        }
+
+        /**
+         * TO-DO
+         */
 
         return $this;
     }
