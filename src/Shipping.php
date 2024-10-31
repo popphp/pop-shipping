@@ -301,24 +301,34 @@ class Shipping
     /**
      * Get rates
      *
-     * @return Shipping
+     * @return mixed
      */
-    public function getRates(): Shipping
+    public function getRates(): mixed
     {
-        $this->adapter?->getRates();
-        return $this;
+        return $this->adapter?->getRates();
     }
 
     /**
      * Get tracking
      *
      * @param  string|array|null $trackingNumbers
-     * @return Shipping
+     * @return mixed
      */
-    public function getTracking(string|array|null $trackingNumbers = null): Shipping
+    public function getTracking(string|array|null $trackingNumbers = null): mixed
     {
-        $this->adapter?->getTracking($trackingNumbers);
-        return $this;
+        return $this->adapter?->getTracking($trackingNumbers);
+    }
+
+    /**
+     * Validate address
+     *
+     * @param  mixed $address  An array of address data or a string with containing "from" to indicate
+     *                         using the ship-from address. If empty, will default to the ship-to address
+     * @return mixed
+     */
+    public function validateAddress(mixed $address = null): mixed
+    {
+        return $this->adapter?->validateAddress($address);
     }
 
 }
