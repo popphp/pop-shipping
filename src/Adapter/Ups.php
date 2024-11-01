@@ -64,9 +64,85 @@ class Ups extends AbstractAdapter
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
         }
 
-        /**
-         * TO-DO
-         */
+        $shipper   = [];
+        $recipient = [];
+        $packages  = [];
+
+        if (!empty($this->shipTo['address1'])) {
+            $shipper['Address']['AddressLine'] = [$this->shipTo['address1']];
+            if (!empty($this->shipTo['address2'])) {
+                $shipper['Address']['AddressLine'] = $this->shipTo['address2'];
+            }
+        }
+        if (!empty($this->shipTo['city'])) {
+            $shipper['Address']['City'] = $this->shipTo['city'];
+        }
+        if (!empty($this->shipTo['state'])) {
+            $shipper['Address']['StateProvinceCode'] = $this->shipTo['state'];
+        }
+        $shipper['Address']['PostalCode']  = $this->shipTo['zip'];
+        $shipper['Address']['CountryCode'] = $this->shipTo['countryCode'] ?? 'US';
+
+        if (!empty($this->shipFrom['address1'])) {
+            $recipient['Address']['AddressLine'] = [$this->shipFrom['address1']];
+            if (!empty($this->shipFrom['address2'])) {
+                $recipient['Address']['AddressLine'] = $this->shipFrom['address2'];
+            }
+        }
+        if (!empty($this->shipFrom['city'])) {
+            $recipient['Address']['City'] = $this->shipFrom['city'];
+        }
+        if (!empty($this->shipFrom['state'])) {
+            $recipient['Address']['StateProvinceCode'] = $this->shipFrom['state'];
+        }
+        $recipient['Address']['PostalCode']  = $this->shipFrom['zip'];
+        $recipient['Address']['CountryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+
+        foreach ($this->packages as $package) {
+            $pkg = [
+                'weight' => [
+                    'value' => $package->getWeight(),
+                    'units'  => $package->getWeightUnit()
+                ],
+                'dimensions' => [
+                    'width'  => $package->getWidth(),
+                    'height' => $package->getHeight(),
+                    'length' => $package->getDepth(),
+                    'units'  => $package->getDimensionUnit()
+                ]
+            ];
+
+            if ($package->hasValue()) {
+                $pkg['declaredValue'] = [
+                    'amount'   => $package->getValue(),
+                    'currency' => $package->getValueUnit()
+                ];
+            }
+
+            $packages[] = $pkg;
+        }
+
+        $data = [
+            'RateRequest' => [
+                'Request' => [
+                    'RequestOption' => 'RATE'
+                ],
+                'PickupType' => $this->shipType ?? '06',
+                'Shipment'   => [
+                    'Shipper'     => $shipper,
+                    'ShipTo'      => $recipient,
+                    'ShipFrom'    => $shipper,
+                    'NumOfPieces' => count($this->packages),
+                    'Package'     => $packages
+                ]
+            ]
+        ];
+
+        $transSource = $this->isProd ? $this->userAgent : 'testing';
+
+        $this->client->reset();
+        $this->client->addHeader('transId', uniqid())
+            ->addHeader('transactionSrc', $transSource);
 
         return $this;
     }

@@ -64,9 +64,86 @@ class Fedex extends AbstractAdapter
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
         }
 
-        /**
-         * TO-DO
-         */
+        $shipper   = ['address' => []];
+        $recipient = ['address' => []];
+        $packages  = [];
+
+        if (!empty($this->shipTo['address1'])) {
+            $shipper['address']['streetLines'] = [$this->shipTo['address1']];
+            if (!empty($this->shipTo['address2'])) {
+                $shipper['address']['streetLines'][] = $this->shipTo['address2'];
+            }
+        }
+        if (!empty($this->shipTo['city'])) {
+            $shipper['address']['city'] = $this->shipTo['city'];
+        }
+        if (!empty($this->shipTo['state'])) {
+            $shipper['address']['stateOrProvinceCode'] = $this->shipTo['state'];
+        }
+        $shipper['address']['postalCode']  = $this->shipTo['zip'];
+        $shipper['address']['countryCode'] = $this->shipTo['countryCode'] ?? 'US';
+        $shipper['address']['residential'] = (bool)$this->shipTo['residential'] ?? false;
+
+        if (!empty($this->shipFrom['address1'])) {
+            $recipient['address']['streetLines'] = [$this->shipFrom['address1']];
+            if (!empty($this->shipFrom['address2'])) {
+                $recipient['address']['streetLines'][] = $this->shipFrom['address2'];
+            }
+        }
+        if (!empty($this->shipFrom['city'])) {
+            $recipient['address']['city'] = $this->shipFrom['city'];
+        }
+        if (!empty($this->shipFrom['state'])) {
+            $recipient['address']['stateOrProvinceCode'] = $this->shipFrom['state'];
+        }
+        $recipient['address']['postalCode']  = $this->shipFrom['zip'];
+        $recipient['address']['countryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+        $recipient['address']['residential'] = (bool)$this->shipFrom['residential'] ?? false;
+
+        foreach ($this->packages as $package) {
+            $pkg = [
+                'weight' => [
+                    'value' => $package->getWeight(),
+                    'units'  => $package->getWeightUnit()
+                ],
+                'dimensions' => [
+                    'width'  => $package->getWidth(),
+                    'height' => $package->getHeight(),
+                    'length' => $package->getDepth(),
+                    'units'  => $package->getDimensionUnit()
+                ]
+            ];
+
+            if ($package->hasValue()) {
+                $pkg['declaredValue'] = [
+                    'amount'   => $package->getValue(),
+                    'currency' => $package->getValueUnit()
+                ];
+            }
+
+            $packages[] = $pkg;
+        }
+
+        $data = [
+            'accountNumber' => [
+                'value' => $this->accountNumber
+            ],
+            'requestedShipment' => [
+                'shipper'                   => $shipper,
+                'recipient'                 => $recipient,
+                'requestedPackageLineItems' => $packages,
+                'rateRequestType'           => ['LIST'],
+                'pickupType'                => $this->shipType ?? 'DROPOFF_AT_FEDEX_LOCATION'
+            ],
+        ];
+
+        $this->client->reset()->setData($data);
+
+        $response = $this->client->post($this->ratesApiUrl);
+
+        if ($response->isSuccess()) {
+            $this->response = $response->getParsedResponse();
+        }
 
         return $this;
     }

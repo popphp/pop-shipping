@@ -49,6 +49,18 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     protected string $userAgent = 'popphp/pop-shipping 3.0.0';
 
     /**
+     * Account number
+     * @var ?string
+     */
+    protected ?string $accountNumber = null;
+
+    /**
+     * Ship type (Drop-off, Pick-up, etc)
+     * @var ?string
+     */
+    protected ?string $shipType = null;
+
+    /**
      * AbstractAdapter packages
      * @var Package[]
      */
@@ -62,15 +74,41 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
 
     /**
      * Ship to fields
+     *
      * @var array
      */
-    protected array $shipTo = [];
+    protected array $shipTo = [
+        'first_name'  => null,
+        'last_name'   => null,
+        'company'     => null,
+        'address1'    => null,
+        'address2'    => null,
+        'city'        => null,
+        'state'       => null,
+        'zip'         => null,
+        'country'     => null,
+        'phone'       => null,
+        'residential' => false,
+    ];
 
     /**
      * Ship from fields
+     *
      * @var array
      */
-    protected array $shipFrom = [];
+    protected array $shipFrom = [
+        'first_name'  => null,
+        'last_name'   => null,
+        'company'     => null,
+        'address1'    => null,
+        'address2'    => null,
+        'city'        => null,
+        'state'       => null,
+        'zip'         => null,
+        'country'     => null,
+        'phone'       => null,
+        'residential' => false,
+    ];
 
     /**
      * API response
@@ -81,14 +119,16 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Create shipping adapter
      *
-     * @param  string  $authToken
-     * @param  bool    $prod
+     * @param  string $accountNumber
+     * @param  string $authToken
+     * @param  bool   $prod
      * @return static
      */
-    public static function createAdapter(string $authToken, bool $prod = false): static
+    public static function createAdapter(string $accountNumber, string $authToken, bool $prod = false): static
     {
         $adapter = new static();
-        $adapter->setProduction($prod);
+        $adapter->setAccountNumber($accountNumber)
+            ->setProduction($prod);
 
         $client = new Http\Client(
             Http\Auth::createBearer($authToken),
@@ -101,6 +141,30 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
         $adapter->setClient($client);
 
         return $adapter;
+    }
+
+    /**
+     * Set account number
+     *
+     * @param  string $accountNumber
+     * @return AbstractAdapter
+     */
+    public function setAccountNumber(string $accountNumber): AbstractAdapter
+    {
+        $this->accountNumber = $accountNumber;
+        return $this;
+    }
+
+    /**
+     * Set ship type
+     *
+     * @param  string $shipType
+     * @return AbstractAdapter
+     */
+    public function setShipType(string $shipType): AbstractAdapter
+    {
+        $this->shipType = $shipType;
+        return $this;
     }
 
     /**
@@ -140,6 +204,26 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
+     * Get account number
+     *
+     * @return ?string
+     */
+    public function getAccountNumber(): ?string
+    {
+        return $this->accountNumber;
+    }
+
+    /**
+     * Get ship type
+     *
+     * @return ?string
+     */
+    public function getShipType(): ?string
+    {
+        return $this->shipType;
+    }
+
+    /**
      * Get rates API URL
      *
      * @return ?string
@@ -167,6 +251,26 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     public function getUserAgent(): string
     {
         return $this->userAgent;
+    }
+
+    /**
+     * Has account number
+     *
+     * @return bool
+     */
+    public function hasAccountNumber(): bool
+    {
+        return !empty($this->accountNumber);
+    }
+
+    /**
+     * Has ship type
+     *
+     * @return bool
+     */
+    public function hasShipType(): bool
+    {
+        return !empty($this->shipType);
     }
 
     /**
@@ -336,7 +440,12 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      */
     public function setShipTo(array $shipTo): AbstractAdapter
     {
-        $this->shipTo = $shipTo;
+        foreach ($shipTo as $key => $value) {
+            if (array_key_exists($key, $this->shipTo)) {
+                $this->shipTo[$key] = $value;
+            }
+        }
+
         return $this;
     }
 
@@ -368,7 +477,12 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      */
     public function setShipFrom(array $shipFrom): AbstractAdapter
     {
-        $this->shipFrom = $shipFrom;
+        foreach ($shipFrom as $key => $value) {
+            if (array_key_exists($key, $this->shipFrom)) {
+                $this->shipFrom[$key] = $value;
+            }
+        }
+
         return $this;
     }
 

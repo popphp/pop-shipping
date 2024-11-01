@@ -57,6 +57,24 @@ class Package
     protected mixed $value = null;
 
     /**
+     * Package dimension unit
+     * @var mixed
+     */
+    protected mixed $dimensionUnit = 'IN';
+
+    /**
+     * Package weight unit
+     * @var mixed
+     */
+    protected mixed $weightUnit = 'LB';
+
+    /**
+     * Package value unit
+     * @var mixed
+     */
+    protected mixed $valueUnit = 'USD';
+
+    /**
      * Packaging cost value (box, wrapping, tape, etc)
      * @var mixed
      */
@@ -274,6 +292,72 @@ class Package
     public function hasValue(): bool
     {
         return (null !== $this->value);
+    }
+
+    /**
+     * Set package dimension unit
+     *
+     * @param  string $unit
+     * @return Package
+     */
+    public function setDimensionUnit(string $unit): Package
+    {
+        $this->dimensionUnit = $unit;
+        return $this;
+    }
+
+    /**
+     * Get package dimension unit
+     *
+     * @return string
+     */
+    public function getDimensionUnit(): string
+    {
+        return $this->dimensionUnit;
+    }
+
+    /**
+     * Set package weight unit
+     *
+     * @param  string $unit
+     * @return Package
+     */
+    public function setWeightUnit(string $unit): Package
+    {
+        $this->weightUnit = $unit;
+        return $this;
+    }
+
+    /**
+     * Get package weight unit
+     *
+     * @return string
+     */
+    public function getWeightUnit(): string
+    {
+        return $this->weightUnit;
+    }
+
+    /**
+     * Set package value unit
+     *
+     * @param  string $unit
+     * @return Package
+     */
+    public function setValueUnit(string $unit): Package
+    {
+        $this->valueUnit = $unit;
+        return $this;
+    }
+
+    /**
+     * Get package value unit
+     *
+     * @return string
+     */
+    public function getValueUnit(): string
+    {
+        return $this->valueUnit;
     }
 
     /**
