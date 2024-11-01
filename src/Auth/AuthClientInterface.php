@@ -27,6 +27,50 @@ interface AuthClientInterface
 {
 
     /**
+     * Set auth API URL
+     *
+     * @param  string $authApiUrl
+     * @return AuthClientInterface
+     */
+    public function setAuthApiUrl(string $authApiUrl): AuthClientInterface;
+
+    /**
+     * Get auth API URL
+     *
+     * @return ?string
+     */
+    public function getAuthApiUrl(): ?string;
+
+    /**
+     * Has auth API URL
+     *
+     * @return bool
+     */
+    public function hasAuthApiUrl(): bool;
+
+    /**
+     * Set account number
+     *
+     * @param  string $accountNumber
+     * @return AuthClientInterface
+     */
+    public function setAccountNumber(string $accountNumber): AuthClientInterface;
+
+    /**
+     * Get account number
+     *
+     * @return ?string
+     */
+    public function getAccountNumber(): ?string;
+
+    /**
+     * Has account number
+     *
+     * @return bool
+     */
+    public function hasAccountNumber(): bool;
+
+    /**
      * Get token data
      *
      * @param  ?string $key

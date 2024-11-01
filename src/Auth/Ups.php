@@ -52,19 +52,20 @@ class Ups extends AbstractAuthClient
      *
      * @param  string $clientId
      * @param  string $secret
-     * @param  string $merchantId
+     * @param  string $accountId
      * @param  bool   $prod
      * @return static
      */
-    public static function createAuthClient(string $clientId, string $secret, string $merchantId, bool $prod = false): static
+    public static function createAuthClient(string $clientId, string $secret, string $accountId, bool $prod = false): static
     {
         $authClient = new static();
-        $authClient->setProduction($prod);
+        $authClient->setAccountNumber($accountId)
+            ->setProduction($prod);
 
         $client = new Http\Client(Http\Auth::createBasic($clientId, $secret), [
             'base_uri' => $authClient->getApiUrl(),
             'method'   => 'POST',
-            'headers'  => ['x-merchant-id' => $merchantId],
+            'headers'  => ['x-merchant-id' => $accountId],
             'data'     => [
                 'grant_type'    => 'client_credentials'
             ]

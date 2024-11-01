@@ -45,7 +45,7 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     protected ?Http\Client $client = null;
 
     /**
-     * Is produciton flag
+     * Is production flag
      * @var bool
      */
     protected bool $isProd = false;

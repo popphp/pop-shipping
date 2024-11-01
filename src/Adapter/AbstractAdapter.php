@@ -14,6 +14,7 @@
 namespace Pop\Shipping\Adapter;
 
 use Pop\Http;
+use Pop\Shipping\Auth\AbstractAuthClient;
 use Pop\Shipping\Client\AbstractShippingClient;
 use Pop\Shipping\Package;
 
@@ -29,6 +30,12 @@ use Pop\Shipping\Package;
  */
 abstract class AbstractAdapter extends AbstractShippingClient implements AdapterInterface
 {
+
+    /**
+     * Auth clientL
+     * @var ?AbstractAuthClient
+     */
+    protected ?AbstractAuthClient $authClient = null;
 
     /**
      * Rates API URL
@@ -49,13 +56,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     protected string $userAgent = 'popphp/pop-shipping 3.0.0';
 
     /**
-     * Account number
-     * @var ?string
-     */
-    protected ?string $accountNumber = null;
-
-    /**
-     * Ship type (Drop-off, Pick-up, etc)
+     * Ship type (Drop-off, Pick-up, etc.)
      * @var ?string
      */
     protected ?string $shipType = null;
@@ -119,39 +120,36 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Create shipping adapter
      *
-     * @param  string $accountNumber
-     * @param  string $authToken
-     * @param  bool   $prod
+     * @param  AbstractAuthClient $authClient
      * @return static
      */
-    public static function createAdapter(string $accountNumber, string $authToken, bool $prod = false): static
+    public static function createAdapter(AbstractAuthClient $authClient): static
     {
         $adapter = new static();
-        $adapter->setAccountNumber($accountNumber)
-            ->setProduction($prod);
+        $adapter->setAuthClient($authClient);
 
-        $client = new Http\Client(
-            Http\Auth::createBearer($authToken),
-            [
-                'base_uri' => $adapter->getApiUrl(),
-                'type'     => 'application/json'
-            ]
-        );
-
-        $adapter->setClient($client);
+        if ($authClient->hasAuthToken()) {
+            $adapter->setClient(new Http\Client(
+                Http\Auth::createBearer($authClient->getAuthToken()),
+                [
+                    'base_uri' => $adapter->getApiUrl(),
+                    'type'     => 'application/json'
+                ]
+            ));
+        }
 
         return $adapter;
     }
 
     /**
-     * Set account number
+     * Set ship type
      *
-     * @param  string $accountNumber
+     * @param  AbstractAuthClient $authClient
      * @return AbstractAdapter
      */
-    public function setAccountNumber(string $accountNumber): AbstractAdapter
+    public function setAuthClient(AbstractAuthClient $authClient): AbstractAdapter
     {
-        $this->accountNumber = $accountNumber;
+        $this->authClient = $authClient;
         return $this;
     }
 
@@ -204,13 +202,13 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
-     * Get account number
+     * Get auth client
      *
-     * @return ?string
+     * @return ?AbstractAuthClient
      */
-    public function getAccountNumber(): ?string
+    public function getAuthClient(): ?AbstractAuthClient
     {
-        return $this->accountNumber;
+        return $this->authClient;
     }
 
     /**
@@ -254,13 +252,13 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
-     * Has account number
+     * Has auth client
      *
      * @return bool
      */
-    public function hasAccountNumber(): bool
+    public function hasAuthClient(): bool
     {
-        return !empty($this->accountNumber);
+        return !empty($this->authClient);
     }
 
     /**

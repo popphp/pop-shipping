@@ -126,7 +126,7 @@ class Fedex extends AbstractAdapter
 
         $data = [
             'accountNumber' => [
-                'value' => $this->accountNumber
+                'value' => $this->authClient->getAccountNumber()
             ],
             'requestedShipment' => [
                 'shipper'                   => $shipper,

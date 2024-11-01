@@ -44,13 +44,40 @@ class Ups extends AbstractAdapter
      * Rates API URL
      * @var ?string
      */
-    protected ?string $ratesApiUrl = '/api/rating/v2403/Rate'; // POST
+    protected ?string $ratesApiUrl = '/api/rating/v2403/Shop'; // POST
 
     /**
      * Tracking API URL
      * @var ?string
      */
     protected ?string $trackingApiUrl = '/api/track/v1/details/'; // GET - requires the tracking number to be appended to the URL
+
+    /**
+     * UPS Shipping Services
+     * @var array
+     */
+    protected array $shippingServices = [
+        '01' => 'Next Day Air',
+        '02' => '2nd Day Air',
+        '03' => 'Ground',
+        '12' => '3 Day Select',
+        '13' => 'Next Day Air Saver',
+        '14' => 'Next Day Air Early',
+        '59' => '2nd Day Air A.M.',
+        '75' => 'Heavy Goods',
+        '07' => 'Worldwide Express',
+        '08' => 'Worldwide Expedited',
+        '11' => 'Standard',
+        '54' => 'Worldwide Express Plus',
+        '65' => 'Worldwide Saver',
+        '70' => 'Access Point Economy',
+        '82' => 'Today Standard',
+        '83' => 'Today Dedicated Courier',
+        '84' => 'Today Intercity',
+        '85' => 'Today Express',
+        '86' => 'Today Express Saver',
+        '96' => 'Worldwide Express Freight',
+    ];
 
     /**
      * Get rates
@@ -99,16 +126,34 @@ class Ups extends AbstractAdapter
         $recipient['Address']['CountryCode'] = $this->shipFrom['countryCode'] ?? 'US';
 
         foreach ($this->packages as $package) {
+            if ($package->getDimensionUnit() == 'OZ') {
+                $weightUnitDesc = 'Ounces';
+            } else if ($package->getDimensionUnit() == 'KG') {
+                $weightUnitDesc = 'Kilograms';
+            } else {
+                $weightUnitDesc = 'Pounds';
+            }
+
             $pkg = [
-                'weight' => [
-                    'value' => $package->getWeight(),
-                    'units'  => $package->getWeightUnit()
+                "PackagingType" => [
+                    "Code" => "02",
+                    "Description" => "Packaging"
                 ],
-                'dimensions' => [
-                    'width'  => $package->getWidth(),
-                    'height' => $package->getHeight(),
-                    'length' => $package->getDepth(),
-                    'units'  => $package->getDimensionUnit()
+                'Dimensions' => [
+                    'Width'  => (string)$package->getWidth(),
+                    'Height' => (string)$package->getHeight(),
+                    'Length' => (string)$package->getDepth(),
+                    'UnitOfMeasurement' => [
+                        'Code'        => $package->getDimensionUnit(),
+                        'Description' => ($package->getDimensionUnit() == 'IN') ? 'Inches' : 'Centimeters'
+                    ]
+                ],
+                'PackageWeight' => [
+                    'Weight' => (string)$package->getWeight(),
+                    'UnitOfMeasurement' => [
+                        'Code'        => $package->getWeightUnit() . 'S',
+                        'Description' => $weightUnitDesc
+                    ]
                 ]
             ];
 
@@ -125,9 +170,8 @@ class Ups extends AbstractAdapter
         $data = [
             'RateRequest' => [
                 'Request' => [
-                    'RequestOption' => 'RATE'
+                    'RequestOption' => 'SHOP'
                 ],
-                'PickupType' => $this->shipType ?? '06',
                 'Shipment'   => [
                     'Shipper'     => $shipper,
                     'ShipTo'      => $recipient,
@@ -138,11 +182,17 @@ class Ups extends AbstractAdapter
             ]
         ];
 
-        $transSource = $this->isProd ? $this->userAgent : 'testing';
+        $transSource = $this->authClient->isProduction() ? $this->userAgent : 'testing';
 
-        $this->client->reset();
+        $this->client->reset()->setData($data);
         $this->client->addHeader('transId', uniqid())
             ->addHeader('transactionSrc', $transSource);
+
+        $response = $this->client->post($this->ratesApiUrl);
+
+        if ($response->isSuccess()) {
+            $this->response = $response->getParsedResponse();
+        }
 
         return $this;
     }
@@ -172,7 +222,7 @@ class Ups extends AbstractAdapter
         }
 
         $responses   = [];
-        $transSource = $this->isProd ? $this->userAgent : 'testing';
+        $transSource = $this->authClient->isProduction() ? $this->userAgent : 'testing';
 
         $this->client->reset();
         $this->client->addHeader('transId', uniqid())

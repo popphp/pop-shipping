@@ -29,14 +29,6 @@ interface AdapterInterface
 {
 
     /**
-     * Set account number
-     *
-     * @param  string $accountNumber
-     * @return AdapterInterface
-     */
-    public function setAccountNumber(string $accountNumber): AdapterInterface;
-
-    /**
      * Set rates API URL
      *
      * @param  string $ratesApiUrl
@@ -61,13 +53,6 @@ interface AdapterInterface
     public function setUserAgent(string $userAgent): AdapterInterface;
 
     /**
-     * Get account number
-     *
-     * @return ?string
-     */
-    public function getAccountNumber(): ?string;
-
-    /**
      * Get rates API URL
      *
      * @return ?string
@@ -87,13 +72,6 @@ interface AdapterInterface
      * @return string
      */
     public function getUserAgent(): string;
-
-    /**
-     * Has account number
-     *
-     * @return bool
-     */
-    public function hasAccountNumber(): bool;
 
     /**
      * Has rates API URL

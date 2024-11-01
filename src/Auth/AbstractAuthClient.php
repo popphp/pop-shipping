@@ -35,6 +35,12 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
     protected ?string $authApiUrl = null;
 
     /**
+     * Account number
+     * @var ?string
+     */
+    protected ?string $accountNumber = null;
+
+    /**
      * Auth token
      * @var ?string
      */
@@ -88,6 +94,38 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
     public function hasAuthApiUrl(): bool
     {
         return !empty($this->authApiUrl);
+    }
+
+    /**
+     * Set account number
+     *
+     * @param  string $accountNumber
+     * @return AbstractAuthClient
+     */
+    public function setAccountNumber(string $accountNumber): AbstractAuthClient
+    {
+        $this->accountNumber = $accountNumber;
+        return $this;
+    }
+
+    /**
+     * Get account number
+     *
+     * @return ?string
+     */
+    public function getAccountNumber(): ?string
+    {
+        return $this->accountNumber;
+    }
+
+    /**
+     * Has account number
+     *
+     * @return bool
+     */
+    public function hasAccountNumber(): bool
+    {
+        return !empty($this->accountNumber);
     }
 
     /**

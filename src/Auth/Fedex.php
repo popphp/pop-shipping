@@ -55,10 +55,11 @@ class Fedex extends AbstractAuthClient
      * @param  bool    $prod
      * @return static
      */
-    public static function createAuthClient(string $clientId, string $secret, bool $prod = false): static
+    public static function createAuthClient(string $clientId, string $secret, string $accountId, bool $prod = false): static
     {
         $authClient = new static();
-        $authClient->setProduction($prod);
+        $authClient->setAccountNumber($accountId)
+            ->setProduction($prod);
 
         $client = new Http\Client([
             'base_uri' => $authClient->getApiUrl(),
