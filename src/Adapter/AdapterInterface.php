@@ -232,24 +232,31 @@ interface AdapterInterface
     /**
      * Get rates
      *
-     * @return mixed
+     * @return array
      */
-    public function getRates(): mixed;
+    public function getRates(): array;
 
     /**
      * Parse rates response
      *
      * @return mixed
      */
-    public function parseRates(): array;
+    public function parseRatesResponse(): array;
 
     /**
      * Get tracking
      *
      * @param  string|array|null $trackingNumbers
+     * @return array
+     */
+    public function getTracking(string|array|null $trackingNumbers = null): array;
+
+    /**
+     * Parse tracking response
+     *
      * @return mixed
      */
-    public function getTracking(string|array|null $trackingNumbers = null): mixed;
+    public function parseTrackingResponse(): array;
 
     /**
      * Validate address

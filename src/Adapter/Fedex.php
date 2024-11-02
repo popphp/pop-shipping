@@ -56,9 +56,9 @@ class Fedex extends AbstractAdapter
      * Get rates
      *
      * @throws Exception
-     * @return mixed
+     * @return array
      */
-    public function getRates(): mixed
+    public function getRates(): array
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -143,10 +143,9 @@ class Fedex extends AbstractAdapter
 
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
-            return $this->parseRates();
-        } else {
-            return $this;
         }
+
+        return (!empty($this->response)) ? $this->parseRatesResponse() : [];
     }
 
     /**
@@ -154,7 +153,7 @@ class Fedex extends AbstractAdapter
      *
      * @return mixed
      */
-    public function parseRates(): array
+    public function parseRatesResponse(): array
     {
         $results = [];
 
@@ -181,9 +180,9 @@ class Fedex extends AbstractAdapter
      *
      * @param  string|array|null $trackingNumbers
      * @throws Exception
-     * @return mixed
+     * @return array
      */
-    public function getTracking(string|array|null $trackingNumbers = null): mixed
+    public function getTracking(string|array|null $trackingNumbers = null): array
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -200,28 +199,65 @@ class Fedex extends AbstractAdapter
             throw new Exception('Error: No tracking numbers have been passed.');
         }
 
-        $data = [
-            'includeDetailedScans' => true,
-            'trackingInfo'         => []
-        ];
+        $responses = [];
 
         foreach ($this->trackingNumbers as $trackingNumber) {
+            $data = [
+                'includeDetailedScans' => true,
+                'trackingInfo'         => []
+            ];
             $data['trackingInfo'][] = [
                 'trackingNumberInfo' => [
                     'trackingNumber' => $trackingNumber
                 ]
             ];
+
+            $this->client->reset()->setData($data);
+
+            $response = $this->client->post($this->trackingApiUrl);
+
+            if ($response->isSuccess()) {
+                $responses[] = $response->getParsedResponse();
+            }
         }
 
-        $this->client->reset()->setData($data);
-
-        $response = $this->client->post($this->trackingApiUrl);
-
-        if ($response->isSuccess()) {
-            $this->response = $response->getParsedResponse();
+        if (!empty($responses)) {
+            $this->response = $responses;
         }
 
-        return $this;
+        return (!empty($this->response)) ? $this->parseTrackingResponse() : [];
+    }
+
+    /**
+     * Parse tracking response
+     *
+     * @return mixed
+     */
+    public function parseTrackingResponse(): array
+    {
+        $results = [];
+
+        if (!empty($this->response) && is_array($this->response)) {
+            foreach ($this->response as $response) {
+                if (isset($response['output']) && isset($response['output']['completeTrackResults'])) {
+                    foreach ($response['output']['completeTrackResults'] as $completeTrackResult) {
+                        $results[$completeTrackResult['trackingNumber']] = [];
+                        foreach ($completeTrackResult['trackResults'][0]['scanEvents'] as $scanEvent) {
+                            $results[$completeTrackResult['trackingNumber']][] = [
+                                'status'           => $scanEvent['derivedStatus'],
+                                'eventType'        => $scanEvent['eventType'],
+                                'eventDescription' => $scanEvent['eventDescription'],
+                                'dateTime'         => $scanEvent['date']
+                            ];
+                        }
+
+                        usort($results[$completeTrackResult['trackingNumber']], fn($a, $b) => $a['dateTime'] <=> $b['dateTime']);
+                    }
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**

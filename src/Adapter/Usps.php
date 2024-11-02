@@ -56,9 +56,9 @@ class Usps extends AbstractAdapter
      * Get rates
      *
      * @throws Exception
-     * @return mixed
+     * @return array
      */
-    public function getRates(): mixed
+    public function getRates(): array
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -104,7 +104,7 @@ class Usps extends AbstractAdapter
 
         $this->response = $responses;
 
-        return $this;
+        return (!empty($this->response)) ? $this->parseRatesResponse() : [];
     }
 
     /**
@@ -112,7 +112,7 @@ class Usps extends AbstractAdapter
      *
      * @return mixed
      */
-    public function parseRates(): array
+    public function parseRatesResponse(): array
     {
         $results = [];
 
@@ -172,7 +172,19 @@ class Usps extends AbstractAdapter
             $this->response = $responses;
         }
 
-        return $this;
+        return (!empty($this->response)) ? $this->parseTrackingResponse() : [];
+    }
+
+    /**
+     * Parse tracking response
+     *
+     * @return mixed
+     */
+    public function parseTrackingResponse(): array
+    {
+        $results = [];
+
+        return $results;
     }
 
     /**

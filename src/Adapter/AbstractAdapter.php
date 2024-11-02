@@ -528,24 +528,31 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Get rates
      *
-     * @return mixed
+     * @return array
      */
-    abstract public function getRates(): mixed;
+    abstract public function getRates(): array;
 
     /**
      * Parse rates response
      *
      * @return mixed
      */
-    abstract public function parseRates(): array;
+    abstract public function parseRatesResponse(): array;
 
     /**
      * Get tracking
      *
      * @param  string|array|null $trackingNumbers
+     * @return array
+     */
+    abstract public function getTracking(string|array|null $trackingNumbers = null): array;
+
+    /**
+     * Parse tracking response
+     *
      * @return mixed
      */
-    abstract public function getTracking(string|array|null $trackingNumbers = null): mixed;
+    abstract public function parseTrackingResponse(): array;
 
     /**
      * Validate address
