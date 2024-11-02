@@ -95,35 +95,35 @@ class Ups extends AbstractAdapter
         $recipient = [];
         $packages  = [];
 
-        if (!empty($this->shipTo['address1'])) {
-            $shipper['Address']['AddressLine'] = [$this->shipTo['address1']];
-            if (!empty($this->shipTo['address2'])) {
-                $shipper['Address']['AddressLine'] = $this->shipTo['address2'];
-            }
-        }
-        if (!empty($this->shipTo['city'])) {
-            $shipper['Address']['City'] = $this->shipTo['city'];
-        }
-        if (!empty($this->shipTo['state'])) {
-            $shipper['Address']['StateProvinceCode'] = $this->shipTo['state'];
-        }
-        $shipper['Address']['PostalCode']  = $this->shipTo['zip'];
-        $shipper['Address']['CountryCode'] = $this->shipTo['countryCode'] ?? 'US';
-
         if (!empty($this->shipFrom['address1'])) {
-            $recipient['Address']['AddressLine'] = [$this->shipFrom['address1']];
+            $shipper['Address']['AddressLine'] = [$this->shipFrom['address1']];
             if (!empty($this->shipFrom['address2'])) {
-                $recipient['Address']['AddressLine'] = $this->shipFrom['address2'];
+                $shipper['Address']['AddressLine'] = $this->shipFrom['address2'];
             }
         }
         if (!empty($this->shipFrom['city'])) {
-            $recipient['Address']['City'] = $this->shipFrom['city'];
+            $shipper['Address']['City'] = $this->shipFrom['city'];
         }
         if (!empty($this->shipFrom['state'])) {
-            $recipient['Address']['StateProvinceCode'] = $this->shipFrom['state'];
+            $shipper['Address']['StateProvinceCode'] = $this->shipFrom['state'];
         }
-        $recipient['Address']['PostalCode']  = $this->shipFrom['zip'];
-        $recipient['Address']['CountryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+        $shipper['Address']['PostalCode']  = $this->shipFrom['zip'];
+        $shipper['Address']['CountryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+
+        if (!empty($this->shipTo['address1'])) {
+            $recipient['Address']['AddressLine'] = [$this->shipTo['address1']];
+            if (!empty($this->shipTo['address2'])) {
+                $recipient['Address']['AddressLine'] = $this->shipTo['address2'];
+            }
+        }
+        if (!empty($this->shipTo['city'])) {
+            $recipient['Address']['City'] = $this->shipTo['city'];
+        }
+        if (!empty($this->shipTo['state'])) {
+            $recipient['Address']['StateProvinceCode'] = $this->shipTo['state'];
+        }
+        $recipient['Address']['PostalCode']  = $this->shipTo['zip'];
+        $recipient['Address']['CountryCode'] = $this->shipTo['countryCode'] ?? 'US';
 
         foreach ($this->packages as $package) {
             if ($package->getDimensionUnit() == 'OZ') {
@@ -192,9 +192,35 @@ class Ups extends AbstractAdapter
 
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
+            return $this->parseRates();
+        } else {
+            return $this;
+        }
+    }
+
+    /**
+     * Parse rates response
+     *
+     * @return mixed
+     */
+    public function parseRates(): array
+    {
+        $results = [];
+
+        if (!empty($this->response) && is_array($this->response) &&
+            isset($this->response['RateResponse']) && isset($this->response['RateResponse']['RatedShipment'])) {
+            foreach ($this->response['RateResponse']['RatedShipment'] as $ratedShipment) {
+                $results[] = [
+                    'serviceType' => $ratedShipment['Service']['Code'],
+                    'serviceName' => $this->shippingServices[$ratedShipment['Service']['Code']] ?? null,
+                    'totalCharge' => number_format($ratedShipment['TotalCharges']['MonetaryValue'], 2)
+                ];
+            }
+
+            usort($results, fn($a, $b) => $a['totalCharge'] <=> $b['totalCharge']);
         }
 
-        return $this;
+        return $results;
     }
 
     /**

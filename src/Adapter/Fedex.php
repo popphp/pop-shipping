@@ -68,37 +68,37 @@ class Fedex extends AbstractAdapter
         $recipient = ['address' => []];
         $packages  = [];
 
-        if (!empty($this->shipTo['address1'])) {
-            $shipper['address']['streetLines'] = [$this->shipTo['address1']];
-            if (!empty($this->shipTo['address2'])) {
-                $shipper['address']['streetLines'][] = $this->shipTo['address2'];
-            }
-        }
-        if (!empty($this->shipTo['city'])) {
-            $shipper['address']['city'] = $this->shipTo['city'];
-        }
-        if (!empty($this->shipTo['state'])) {
-            $shipper['address']['stateOrProvinceCode'] = $this->shipTo['state'];
-        }
-        $shipper['address']['postalCode']  = $this->shipTo['zip'];
-        $shipper['address']['countryCode'] = $this->shipTo['countryCode'] ?? 'US';
-        $shipper['address']['residential'] = (bool)$this->shipTo['residential'] ?? false;
-
         if (!empty($this->shipFrom['address1'])) {
-            $recipient['address']['streetLines'] = [$this->shipFrom['address1']];
+            $shipper['address']['streetLines'] = [$this->shipFrom['address1']];
             if (!empty($this->shipFrom['address2'])) {
-                $recipient['address']['streetLines'][] = $this->shipFrom['address2'];
+                $shipper['address']['streetLines'][] = $this->shipFrom['address2'];
             }
         }
         if (!empty($this->shipFrom['city'])) {
-            $recipient['address']['city'] = $this->shipFrom['city'];
+            $shipper['address']['city'] = $this->shipFrom['city'];
         }
         if (!empty($this->shipFrom['state'])) {
-            $recipient['address']['stateOrProvinceCode'] = $this->shipFrom['state'];
+            $shipper['address']['stateOrProvinceCode'] = $this->shipFrom['state'];
         }
-        $recipient['address']['postalCode']  = $this->shipFrom['zip'];
-        $recipient['address']['countryCode'] = $this->shipFrom['countryCode'] ?? 'US';
-        $recipient['address']['residential'] = (bool)$this->shipFrom['residential'] ?? false;
+        $shipper['address']['postalCode']  = $this->shipFrom['zip'];
+        $shipper['address']['countryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+        $shipper['address']['residential'] = (bool)$this->shipFrom['residential'] ?? false;
+
+        if (!empty($this->shipTo['address1'])) {
+            $recipient['address']['streetLines'] = [$this->shipTo['address1']];
+            if (!empty($this->shipTo['address2'])) {
+                $recipient['address']['streetLines'][] = $this->shipTo['address2'];
+            }
+        }
+        if (!empty($this->shipTo['city'])) {
+            $recipient['address']['city'] = $this->shipTo['city'];
+        }
+        if (!empty($this->shipTo['state'])) {
+            $recipient['address']['stateOrProvinceCode'] = $this->shipTo['state'];
+        }
+        $recipient['address']['postalCode']  = $this->shipTo['zip'];
+        $recipient['address']['countryCode'] = $this->shipTo['countryCode'] ?? 'US';
+        $recipient['address']['residential'] = (bool)$this->shipTo['residential'] ?? false;
 
         foreach ($this->packages as $package) {
             $pkg = [
@@ -143,9 +143,37 @@ class Fedex extends AbstractAdapter
 
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
+            return $this->parseRates();
+        } else {
+            return $this;
+        }
+    }
+
+    /**
+     * Parse rates response
+     *
+     * @return mixed
+     */
+    public function parseRates(): array
+    {
+        $results = [];
+
+        if (!empty($this->response) && is_array($this->response) &&
+            isset($this->response['output']) && isset($this->response['output']['rateReplyDetails'])) {
+            foreach ($this->response['output']['rateReplyDetails'] as $rateReplyDetail) {
+                if (!empty($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'])) {
+                    $results[] = [
+                        'serviceType' => $rateReplyDetail['serviceType'],
+                        'serviceName' => $rateReplyDetail['serviceName'],
+                        'totalCharge' => number_format($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'], 2)
+                    ];
+                }
+            }
+
+            usort($results, fn($a, $b) => $a['totalCharge'] <=> $b['totalCharge']);
         }
 
-        return $this;
+        return $results;
     }
 
     /**

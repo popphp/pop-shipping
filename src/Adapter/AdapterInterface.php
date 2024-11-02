@@ -237,6 +237,13 @@ interface AdapterInterface
     public function getRates(): mixed;
 
     /**
+     * Parse rates response
+     *
+     * @return mixed
+     */
+    public function parseRates(): array;
+
+    /**
      * Get tracking
      *
      * @param  string|array|null $trackingNumbers

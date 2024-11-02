@@ -126,7 +126,8 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     public static function createAdapter(AbstractAuthClient $authClient): static
     {
         $adapter = new static();
-        $adapter->setAuthClient($authClient);
+        $adapter->setAuthClient($authClient)
+                ->setProduction($authClient->isProduction());
 
         if ($authClient->hasAuthToken()) {
             $adapter->setClient(new Http\Client(
@@ -530,6 +531,13 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      * @return mixed
      */
     abstract public function getRates(): mixed;
+
+    /**
+     * Parse rates response
+     *
+     * @return mixed
+     */
+    abstract public function parseRates(): array;
 
     /**
      * Get tracking

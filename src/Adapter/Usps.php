@@ -44,7 +44,7 @@ class Usps extends AbstractAdapter
      * Rates API URL
      * @var ?string
      */
-    protected ?string $ratesApiUrl = '/prices/v3/base-rates/search'; // POST
+    protected ?string $ratesApiUrl = '/shipments/v3/options/search'; // POST
 
     /**
      * Tracking API URL
@@ -64,11 +64,74 @@ class Usps extends AbstractAdapter
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
         }
 
-        /**
-         * TO-DO
-         */
+        $responses = [];
+
+        foreach ($this->packages as $package) {
+            $data = [
+                'pricingOptions' => [
+                    [
+                        'priceType'         => ($this->shipTo['residential']) ? 'RETAIL' : 'COMMERCIAL',
+                        'paymentAccount'    => [
+                            'accountType'   => 'EPS',
+                            'accountNumber' => $this->authClient->getAccountNumber()
+                        ]
+                    ]
+                ],
+                'originZIPCode'                => $this->shipFrom['zip'],
+                'destinationZIPCode'           => $this->shipTo['zip'],
+                'destinationCountryCode'       => $this->shipTo['countryCode'] ?? 'US',
+                'foreignPostalCode'            => $this->shipTo['zip'],
+                'destinationEntryFacilityType' => 'NONE',
+                'packageDescription'           => [
+                    'weight'                   => $package->getWeight(),
+                    'length'                   => $package->getDepth(),
+                    'width'                    => $package->getWidth(),
+                    'height'                   => $package->getHeight(),
+                    'mailClass'                => 'ALL',
+                    'packageValue'             => $package->getValue()
+                ],
+                'shippingFilter' => 'PRICE'
+            ];
+
+            $this->client->reset()->setData($data);
+
+            $response = $this->client->post($this->ratesApiUrl);
+
+            if ($response->isSuccess()) {
+                $responses[] = $response->getParsedResponse();
+            }
+        }
+
+        $this->response = $responses;
 
         return $this;
+    }
+
+    /**
+     * Parse rates response
+     *
+     * @return mixed
+     */
+    public function parseRates(): array
+    {
+        $results = [];
+
+        if (!empty($this->response) && is_array($this->response) &&
+            isset($this->response['pricingOptions']) && isset($this->response['pricingOptions']['shippingOptions'])) {
+            foreach ($this->response['pricingOptions']['shippingOptions'] as $shippingOption) {
+                if (!empty($shippingOption['rateOptions'][0]['totalBasePrice'])) {
+                    $results[] = [
+                        'serviceType' => $shippingOption['mailClass'],
+                        'serviceName' => ucwords(str_replace('_', ' ', strtolower($shippingOption['mailClass']))),
+                        'totalCharge' => number_format($shippingOption['rateOptions'][0]['totalBasePrice'], 2)
+                    ];
+                }
+            }
+
+            usort($results, fn($a, $b) => $a['totalCharge'] <=> $b['totalCharge']);
+        }
+
+        return $results;
     }
 
     /**
