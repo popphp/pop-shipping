@@ -1,11 +1,11 @@
 <?php
 /**
- * Pop PHP Framework (http://www.popphp.org/)
+ * Pop PHP Framework (https://www.popphp.org/)
  *
  * @link       https://github.com/popphp/popphp-framework
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  */
 
 /**
@@ -20,9 +20,9 @@ use Pop\Shipping\Client\AbstractShippingClient;
  *
  * @category   Pop
  * @package    Pop\Shipping
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
 class Fedex extends AbstractAdapter
@@ -51,6 +51,12 @@ class Fedex extends AbstractAdapter
      * @var ?string
      */
     protected ?string $trackingApiUrl = '/track/v1/trackingnumbers'; // POST
+
+    /**
+     * Address API URL
+     * @var ?string
+     */
+    protected ?string $addressApiUrl = '/address/v1/addresses/resolve'; // POST
 
     /**
      * Get rates
@@ -286,9 +292,35 @@ class Fedex extends AbstractAdapter
             throw new Exception('Error: There is no ship-to or ship-from address and no other address was provided.');
         }
 
-        /**
-         * TO-DO
-         */
+        $addressToValidate = [];
+
+        if (!empty($address['address1'])) {
+            $addressToValidate['address']['streetLines'] = [$address['address1']];
+            if (!empty($address['address2'])) {
+                $addressToValidate['address']['streetLines'][] = $address['address2'];
+            }
+        }
+        if (!empty($address['city'])) {
+            $addressToValidate['address']['city'] = $address['city'];
+        }
+        if (!empty($address['state'])) {
+            $addressToValidate['address']['stateOrProvinceCode'] = $address['state'];
+        }
+        $addressToValidate['address']['postalCode']  = $address['zip'];
+        $addressToValidate['address']['countryCode'] = $address['countryCode'] ?? 'US';
+        $addressToValidate['address']['residential'] = (bool)$address['residential'] ?? false;
+
+        $data = ['addressesToValidate' => ['address' => $addressToValidate]];
+
+        $this->client->reset()->setData($data);
+
+        $response = $this->client->post($this->addressApiUrl);
+
+        $r = $response->getParsedResponse();
+
+        if ($response->isSuccess()) {
+            $this->response = $response->getParsedResponse();
+        }
 
         return $this;
     }

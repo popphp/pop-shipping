@@ -1,11 +1,11 @@
 <?php
 /**
- * Pop PHP Framework (http://www.popphp.org/)
+ * Pop PHP Framework (https://www.popphp.org/)
  *
  * @link       https://github.com/popphp/popphp-framework
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  */
 
 /**
@@ -20,9 +20,9 @@ use Pop\Shipping\Client\AbstractShippingClient;
  *
  * @category   Pop
  * @package    Pop\Shipping
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
 class Ups extends AbstractAdapter
@@ -227,9 +227,9 @@ class Ups extends AbstractAdapter
      *
      * @param  string|array|null $trackingNumbers
      * @throws Exception
-     * @return mixed
+     * @return array
      */
-    public function getTracking(string|array|null $trackingNumbers = null): mixed
+    public function getTracking(string|array|null $trackingNumbers = null): array
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -276,6 +276,31 @@ class Ups extends AbstractAdapter
     public function parseTrackingResponse(): array
     {
         $results = [];
+
+        if (!empty($this->response) && is_array($this->response)) {
+            foreach ($this->response as $response) {
+                if (isset($response['trackResponse']) && isset($response['trackResponse']['shipment'])) {
+                    foreach ($response['trackResponse']['shipment'] as $shipment) {
+                        if (isset($shipment['package'][0]) && isset($shipment['package'][0]['activity'])) {
+                            $results[$shipment['inquiryNumber']] = [];
+                            foreach ($shipment['package'][0]['activity'] as $activity) {
+                                $date = substr($activity['date'], 0, 4) . '-' . substr($activity['date'], 4, 2) . '-' . substr($activity['date'], 6, 2);
+                                $time = substr($activity['time'], 0, 2) . ':' . substr($activity['time'], 2, 2) . ':' . substr($activity['time'], 4, 2);
+
+                                $results[$shipment['inquiryNumber']][] = [
+                                    'status'           => $activity['status']['statusCode'],
+                                    'eventType'        => $activity['status']['type'],
+                                    'eventDescription' => $activity['status']['description'],
+                                    'dateTime'         => $date . ' ' . $time
+                                ];
+                            }
+
+                            usort($results[$shipment['inquiryNumber']], fn($a, $b) => $a['dateTime'] <=> $b['dateTime']);
+                        }
+                    }
+                }
+            }
+        }
 
         return $results;
     }

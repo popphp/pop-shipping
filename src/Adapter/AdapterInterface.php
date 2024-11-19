@@ -1,11 +1,11 @@
 <?php
 /**
- * Pop PHP Framework (http://www.popphp.org/)
+ * Pop PHP Framework (https://www.popphp.org/)
  *
  * @link       https://github.com/popphp/popphp-framework
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  */
 
 /**
@@ -20,9 +20,9 @@ use Pop\Shipping\Package;
  *
  * @category   Pop
  * @package    Pop\Shipping
- * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
- * @license    http://www.popphp.org/license     New BSD License
+ * @author     Nick Sagona, III <dev@noladev.com>
+ * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
+ * @license    https://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
 interface AdapterInterface
@@ -43,6 +43,14 @@ interface AdapterInterface
      * @return AdapterInterface
      */
     public function setTrackingApiUrl(string $trackingApiUrl): AdapterInterface;
+
+    /**
+     * Set address API URL
+     *
+     * @param  string $addressApiUrl
+     * @return AdapterInterface
+     */
+    public function setAddressApiUrl(string $addressApiUrl): AdapterInterface;
 
     /**
      * Set user-agent
@@ -67,6 +75,13 @@ interface AdapterInterface
     public function getTrackingApiUrl(): ?string;
 
     /**
+     * Get address API URL
+     *
+     * @return ?string
+     */
+    public function getAddressApiUrl(): ?string;
+
+    /**
      * Get user-agent
      *
      * @return string
@@ -86,6 +101,13 @@ interface AdapterInterface
      * @return bool
      */
     public function hasTrackingApiUrl(): bool;
+
+    /**
+     * Has address API URL
+     *
+     * @return bool
+     */
+    public function hasAddressApiUrl(): bool;
 
     /**
      * Add shipping packages

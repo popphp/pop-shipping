@@ -4,7 +4,6 @@ pop-shipping
 [![Build Status](https://github.com/popphp/pop-shipping/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-shipping/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-shipping)](http://cc.popphp.org/pop-shipping/)
 
-[![Join the chat at https://popphp.slack.com](https://media.popphp.org/img/slack.svg)](https://popphp.slack.com)
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
 * [Overview](#overview)
