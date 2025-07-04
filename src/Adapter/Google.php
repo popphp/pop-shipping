@@ -286,20 +286,20 @@ class Google
 
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
-            if (isset($parsedResponse['result']['verdict']) && isset($parsedResponse['result']['verdict']['possibleNextAction'])) {
-                if (isset($parsedResponse['result']['verdict']['hasUnconfirmedComponents'])) {
-                    $addressString = ucwords(strtolower($parsedResponse['result']['uspsData']['standardizedAddress']['firstAddressLine']));
-                    if (!empty($parsedResponse['result']['uspsData']['standardizedAddress']['city'])) {
-                        $addressString .= ', ' . ucwords(strtolower($parsedResponse['result']['uspsData']['standardizedAddress']['city']));
+            if (isset($this->response['result']['verdict']) && isset($this->response['result']['verdict']['possibleNextAction'])) {
+                if ($this->response['result']['verdict']['possibleNextAction'] == 'CONFIRM') {
+                    $addressString = ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['firstAddressLine']));
+                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['city'])) {
+                        $addressString .= ', ' . ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['city']));
                     }
-                    if (!empty($parsedResponse['result']['uspsData']['standardizedAddress']['state'])) {
-                        $addressString .= ', ' . $parsedResponse['result']['uspsData']['standardizedAddress']['state'];
+                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['state'])) {
+                        $addressString .= ', ' . $this->response['result']['uspsData']['standardizedAddress']['state'];
                     }
-                    if (!empty($parsedResponse['result']['uspsData']['standardizedAddress']['zipCode'])) {
-                        $addressString .= ' ' . $parsedResponse['result']['uspsData']['standardizedAddress']['zipCode'];
+                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCode'])) {
+                        $addressString .= ' ' . $this->response['result']['uspsData']['standardizedAddress']['zipCode'];
                     }
-                    if (!empty($parsedResponse['result']['uspsData']['standardizedAddress']['zipCodeExtension'])) {
-                        $addressString .= '-' . $parsedResponse['result']['uspsData']['standardizedAddress']['zipCodeExtension'];
+                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'])) {
+                        $addressString .= '-' . $this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'];
                     }
 
                     $this->setSuggestedAddress($this->parseAddress($addressString));
@@ -322,8 +322,8 @@ class Google
         $parser->parse($address);
 
         $address1 = trim($parser->getStreetNumber()) . ' ' .
-            ($parser->hasRouteType()) ? trim($parser->getStreetName()) . ' ' .
-            trim($parser->getRouteType()) : trim($parser->getStreetName());
+            (($parser->hasRouteType()) ? trim($parser->getStreetName()) . ' ' .
+            trim($parser->getRouteType()) : trim($parser->getStreetName()));
 
         $postalCode = trim($parser->getPostalCode());
         $zip4       = trim($parser->getZip4());
