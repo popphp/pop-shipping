@@ -67,7 +67,7 @@ class Ups extends AbstractAuthClient
             'method'   => 'POST',
             'headers'  => ['x-merchant-id' => $accountId],
             'data'     => [
-                'grant_type'    => 'client_credentials'
+                'grant_type' => 'client_credentials'
             ]
         ]);
 
