@@ -19,6 +19,8 @@ With it, you can get shipping rates as well as track packages. Currently, the su
 - FedEx
 - USPS
 
+Also, it provides address validation through the Google Maps API.
+
 [Top](#pop-shipping)
 
 Install

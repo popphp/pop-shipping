@@ -13,7 +13,7 @@
  */
 namespace Pop\Shipping\Client;
 
-use Pop\Http;
+use Pop\Http\Client;
 
 /**
  * Pop shipping client interface
@@ -31,17 +31,17 @@ interface ShippingClientInterface
     /**
      * Set the HTTP client
      *
-     * @param  Http\Client $client
+     * @param  Client $client
      * @return ShippingClientInterface
      */
-    public function setClient(Http\Client $client): ShippingClientInterface;
+    public function setClient(Client $client): ShippingClientInterface;
 
     /**
      * Get the HTTP client
      *
-     * @return ?Http\Client
+     * @return ?Client
      */
-    public function getClient(): ?Http\Client;
+    public function getClient(): ?Client;
 
     /**
      * Has HTTP client

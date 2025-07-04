@@ -53,12 +53,6 @@ class Fedex extends AbstractAdapter
     protected ?string $trackingApiUrl = '/track/v1/trackingnumbers'; // POST
 
     /**
-     * Address API URL
-     * @var ?string
-     */
-    protected ?string $addressApiUrl = '/address/v1/addresses/resolve'; // POST
-
-    /**
      * Get rates
      *
      * @throws Exception
@@ -86,8 +80,8 @@ class Fedex extends AbstractAdapter
         if (!empty($this->shipFrom['state'])) {
             $shipper['address']['stateOrProvinceCode'] = $this->shipFrom['state'];
         }
-        $shipper['address']['postalCode']  = $this->shipFrom['zip'];
-        $shipper['address']['countryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+        $shipper['address']['postalCode']  = $this->shipFrom['postal_code'];
+        $shipper['address']['countryCode'] = $this->shipFrom['country'] ?? 'US';
         $shipper['address']['residential'] = (bool)$this->shipFrom['residential'] ?? false;
 
         if (!empty($this->shipTo['address1'])) {
@@ -102,8 +96,8 @@ class Fedex extends AbstractAdapter
         if (!empty($this->shipTo['state'])) {
             $recipient['address']['stateOrProvinceCode'] = $this->shipTo['state'];
         }
-        $recipient['address']['postalCode']  = $this->shipTo['zip'];
-        $recipient['address']['countryCode'] = $this->shipTo['countryCode'] ?? 'US';
+        $recipient['address']['postalCode']  = $this->shipTo['postal_code'];
+        $recipient['address']['countryCode'] = $this->shipTo['country'] ?? 'US';
         $recipient['address']['residential'] = (bool)$this->shipTo['residential'] ?? false;
 
         foreach ($this->packages as $package) {
@@ -264,65 +258,6 @@ class Fedex extends AbstractAdapter
         }
 
         return $results;
-    }
-
-    /**
-     * Validate address
-     *
-     * @param  mixed $address  An array of address data or a string with containing "from" to indicate
-     *                         using the ship-from address. If empty, will default to the ship-to address
-     * @throws Exception
-     * @return mixed
-     */
-    public function validateAddress(mixed $address = null): mixed
-    {
-        if ($address !== null) {
-            // Use the ship-from address
-            if (is_string($address) && str_contains(strtolower($address), 'from') && !empty($this->shipFrom)) {
-                $address = $this->shipFrom;
-            // Else, check that the address is an array of address data
-            } else if (!is_array($address)) {
-                throw new Exception('Error: The provided address must be an array of address data.');
-            }
-        } else if (!empty($this->shipTo)) {
-            $address = $this->shipTo;
-        }
-
-        if (empty($address) && empty($this->shipTo) && empty($this->shipFrom)) {
-            throw new Exception('Error: There is no ship-to or ship-from address and no other address was provided.');
-        }
-
-        $addressToValidate = [];
-
-        if (!empty($address['address1'])) {
-            $addressToValidate['address']['streetLines'] = [$address['address1']];
-            if (!empty($address['address2'])) {
-                $addressToValidate['address']['streetLines'][] = $address['address2'];
-            }
-        }
-        if (!empty($address['city'])) {
-            $addressToValidate['address']['city'] = $address['city'];
-        }
-        if (!empty($address['state'])) {
-            $addressToValidate['address']['stateOrProvinceCode'] = $address['state'];
-        }
-        $addressToValidate['address']['postalCode']  = $address['zip'];
-        $addressToValidate['address']['countryCode'] = $address['countryCode'] ?? 'US';
-        $addressToValidate['address']['residential'] = (bool)$address['residential'] ?? false;
-
-        $data = ['addressesToValidate' => ['address' => $addressToValidate]];
-
-        $this->client->reset()->setData($data);
-
-        $response = $this->client->post($this->addressApiUrl);
-
-        $r = $response->getParsedResponse();
-
-        if ($response->isSuccess()) {
-            $this->response = $response->getParsedResponse();
-        }
-
-        return $this;
     }
 
 }

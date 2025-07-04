@@ -14,6 +14,7 @@
 namespace Pop\Shipping\Adapter;
 
 use Pop\Http;
+use Pop\Shipping\Address;
 use Pop\Shipping\Auth\AbstractAuthClient;
 use Pop\Shipping\Client\AbstractShippingClient;
 use Pop\Shipping\Package;
@@ -50,12 +51,6 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     protected ?string $trackingApiUrl = null;
 
     /**
-     * Address API URL
-     * @var ?string
-     */
-    protected ?string $addressApiUrl = null;
-
-    /**
      * User-Agent
      * @var string
      */
@@ -82,40 +77,16 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Ship to fields
      *
-     * @var array
+     * @var ?Address
      */
-    protected array $shipTo = [
-        'first_name'  => null,
-        'last_name'   => null,
-        'company'     => null,
-        'address1'    => null,
-        'address2'    => null,
-        'city'        => null,
-        'state'       => null,
-        'zip'         => null,
-        'country'     => null,
-        'phone'       => null,
-        'residential' => false,
-    ];
+    protected ?Address $shipTo = null;
 
     /**
      * Ship from fields
      *
-     * @var array
+     * @var ?Address
      */
-    protected array $shipFrom = [
-        'first_name'  => null,
-        'last_name'   => null,
-        'company'     => null,
-        'address1'    => null,
-        'address2'    => null,
-        'city'        => null,
-        'state'       => null,
-        'zip'         => null,
-        'country'     => null,
-        'phone'       => null,
-        'residential' => false,
-    ];
+    protected ?Address $shipFrom = null;
 
     /**
      * API response
@@ -149,7 +120,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
-     * Set ship type
+     * Set auth client
      *
      * @param  AbstractAuthClient $authClient
      * @return AbstractAdapter
@@ -193,18 +164,6 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     public function setTrackingApiUrl(string $trackingApiUrl): AbstractAdapter
     {
         $this->trackingApiUrl = $trackingApiUrl;
-        return $this;
-    }
-
-    /**
-     * Set address API URL
-     *
-     * @param  string $addressApiUrl
-     * @return AbstractAdapter
-     */
-    public function setAddressApiUrl(string $addressApiUrl): AbstractAdapter
-    {
-        $this->addressApiUrl = $addressApiUrl;
         return $this;
     }
 
@@ -261,16 +220,6 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
-     * Get address API URL
-     *
-     * @return ?string
-     */
-    public function getAddressApiUrl(): ?string
-    {
-        return $this->addressApiUrl;
-    }
-
-    /**
      * Get user-agent
      *
      * @return string
@@ -318,16 +267,6 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     public function hasTrackingApiUrl(): bool
     {
         return !empty($this->trackingApiUrl);
-    }
-
-    /**
-     * Has address API URL
-     *
-     * @return bool
-     */
-    public function hasAddressApiUrl(): bool
-    {
-        return !empty($this->addressApiUrl);
     }
 
     /**
@@ -472,26 +411,21 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Set ship to
      *
-     * @param  array $shipTo
+     * @param  array|Address $shipTo
      * @return AbstractAdapter
      */
-    public function setShipTo(array $shipTo): AbstractAdapter
+    public function setShipTo(array|Address $shipTo): AbstractAdapter
     {
-        foreach ($shipTo as $key => $value) {
-            if (array_key_exists($key, $this->shipTo)) {
-                $this->shipTo[$key] = $value;
-            }
-        }
-
+        $this->shipTo = !($shipTo instanceof Address) ? new Address($shipTo) : $shipTo;
         return $this;
     }
 
     /**
      * Get ship to
      *
-     * @return array
+     * @return Address
      */
-    public function getShipTo(): array
+    public function getShipTo(): Address
     {
         return $this->shipTo;
     }
@@ -503,32 +437,27 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      */
     public function hasShipTo(): bool
     {
-        return !empty($this->shipTo);
+        return ($this->shipTo !== null);
     }
 
     /**
      * Set ship from
      *
-     * @param  array $shipFrom
+     * @param  array|Address $shipFrom
      * @return AbstractAdapter
      */
-    public function setShipFrom(array $shipFrom): AbstractAdapter
+    public function setShipFrom(array|Address $shipFrom): AbstractAdapter
     {
-        foreach ($shipFrom as $key => $value) {
-            if (array_key_exists($key, $this->shipFrom)) {
-                $this->shipFrom[$key] = $value;
-            }
-        }
-
+        $this->shipTo = !($shipFrom instanceof Address) ? new Address($shipFrom) : $shipFrom;
         return $this;
     }
 
     /**
      * Get ship from
      *
-     * @return array
+     * @return Address
      */
-    public function getShipFrom(): array
+    public function getShipFrom(): Address
     {
         return $this->shipFrom;
     }
@@ -540,7 +469,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      */
     public function hasShipFrom(): bool
     {
-        return !empty($this->shipFrom);
+        return ($this->shipFrom !== null);
     }
 
     /**
@@ -591,13 +520,5 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      * @return mixed
      */
     abstract public function parseTrackingResponse(): array;
-
-    /**
-     * Validate address
-     *
-     * @param  mixed $address
-     * @return mixed
-     */
-    abstract public function validateAddress(mixed $address = null): mixed;
 
 }

@@ -13,6 +13,7 @@
  */
 namespace Pop\Shipping\Adapter;
 
+use Pop\Shipping\Address;
 use Pop\Shipping\Package;
 
 /**
@@ -45,14 +46,6 @@ interface AdapterInterface
     public function setTrackingApiUrl(string $trackingApiUrl): AdapterInterface;
 
     /**
-     * Set address API URL
-     *
-     * @param  string $addressApiUrl
-     * @return AdapterInterface
-     */
-    public function setAddressApiUrl(string $addressApiUrl): AdapterInterface;
-
-    /**
      * Set user-agent
      *
      * @param  string $userAgent
@@ -75,13 +68,6 @@ interface AdapterInterface
     public function getTrackingApiUrl(): ?string;
 
     /**
-     * Get address API URL
-     *
-     * @return ?string
-     */
-    public function getAddressApiUrl(): ?string;
-
-    /**
      * Get user-agent
      *
      * @return string
@@ -101,13 +87,6 @@ interface AdapterInterface
      * @return bool
      */
     public function hasTrackingApiUrl(): bool;
-
-    /**
-     * Has address API URL
-     *
-     * @return bool
-     */
-    public function hasAddressApiUrl(): bool;
 
     /**
      * Add shipping packages
@@ -196,17 +175,17 @@ interface AdapterInterface
     /**
      * Set ship to
      *
-     * @param  array $shipTo
+     * @param  array|Address $shipTo
      * @return AbstractAdapter
      */
-    public function setShipTo(array $shipTo): AbstractAdapter;
+    public function setShipTo(array|Address $shipTo): AbstractAdapter;
 
     /**
      * Get ship to
      *
-     * @return array
+     * @return ?Address
      */
-    public function getShipTo(): array;
+    public function getShipTo(): ?Address;
 
     /**
      * Has ship to
@@ -218,17 +197,17 @@ interface AdapterInterface
     /**
      * Set ship from
      *
-     * @param  array $shipFrom
+     * @param  array|Address $shipFrom
      * @return AbstractAdapter
      */
-    public function setShipFrom(array $shipFrom): AbstractAdapter;
+    public function setShipFrom(array|Address $shipFrom): AbstractAdapter;
 
     /**
      * Get ship from
      *
-     * @return array
+     * @return ?Address
      */
-    public function getShipFrom(): array;
+    public function getShipFrom(): ?Address;
 
     /**
      * Has ship from
@@ -279,13 +258,5 @@ interface AdapterInterface
      * @return mixed
      */
     public function parseTrackingResponse(): array;
-
-    /**
-     * Validate address
-     *
-     * @param  mixed $address
-     * @return mixed
-     */
-    public function validateAddress(mixed $address = null): mixed;
 
 }

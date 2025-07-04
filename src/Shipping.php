@@ -217,10 +217,10 @@ class Shipping
     /**
      * Set ship to
      *
-     * @param  array $shipTo
+     * @param  array|Address $shipTo
      * @return Shipping
      */
-    public function setShipTo(array $shipTo): Shipping
+    public function setShipTo(array|Address $shipTo): Shipping
     {
         $this->adapter?->setShipTo($shipTo);
         return $this;
@@ -229,9 +229,9 @@ class Shipping
     /**
      * Get ship to
      *
-     * @return array
+     * @return Address
      */
-    public function getShipTo(): array
+    public function getShipTo(): Address
     {
         return $this->adapter?->getShipTo();
     }
@@ -249,10 +249,10 @@ class Shipping
     /**
      * Set ship from
      *
-     * @param  array $shipFrom
+     * @param  array|Address $shipFrom
      * @return Shipping
      */
-    public function setShipFrom(array $shipFrom): Shipping
+    public function setShipFrom(array|Address $shipFrom): Shipping
     {
         $this->adapter?->setShipFrom($shipFrom);
         return $this;
@@ -261,9 +261,9 @@ class Shipping
     /**
      * Get ship from
      *
-     * @return array
+     * @return Address
      */
-    public function getShipFrom(): array
+    public function getShipFrom(): Address
     {
         return $this->adapter?->getShipFrom();
     }
@@ -317,18 +317,6 @@ class Shipping
     public function getTracking(string|array|null $trackingNumbers = null): mixed
     {
         return $this->adapter?->getTracking($trackingNumbers);
-    }
-
-    /**
-     * Validate address
-     *
-     * @param  mixed $address  An array of address data or a string with containing "from" to indicate
-     *                         using the ship-from address. If empty, will default to the ship-to address
-     * @return mixed
-     */
-    public function validateAddress(mixed $address = null): mixed
-    {
-        return $this->adapter?->validateAddress($address);
     }
 
 }

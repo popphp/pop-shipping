@@ -107,8 +107,8 @@ class Ups extends AbstractAdapter
         if (!empty($this->shipFrom['state'])) {
             $shipper['Address']['StateProvinceCode'] = $this->shipFrom['state'];
         }
-        $shipper['Address']['PostalCode']  = $this->shipFrom['zip'];
-        $shipper['Address']['CountryCode'] = $this->shipFrom['countryCode'] ?? 'US';
+        $shipper['Address']['PostalCode']  = $this->shipFrom['postal_code'];
+        $shipper['Address']['CountryCode'] = $this->shipFrom['country'] ?? 'US';
 
         if (!empty($this->shipTo['address1'])) {
             $recipient['Address']['AddressLine'] = [$this->shipTo['address1']];
@@ -122,8 +122,8 @@ class Ups extends AbstractAdapter
         if (!empty($this->shipTo['state'])) {
             $recipient['Address']['StateProvinceCode'] = $this->shipTo['state'];
         }
-        $recipient['Address']['PostalCode']  = $this->shipTo['zip'];
-        $recipient['Address']['CountryCode'] = $this->shipTo['countryCode'] ?? 'US';
+        $recipient['Address']['PostalCode']  = $this->shipTo['postal_code'];
+        $recipient['Address']['CountryCode'] = $this->shipTo['country'] ?? 'US';
 
         foreach ($this->packages as $package) {
             if ($package->getDimensionUnit() == 'OZ') {
@@ -303,39 +303,6 @@ class Ups extends AbstractAdapter
         }
 
         return $results;
-    }
-
-    /**
-     * Validate address
-     *
-     * @param  mixed $address  An array of address data or a string with containing "from" to indicate
-     *                         using the ship-from address. If empty, will default to the ship-to address
-     * @throws Exception
-     * @return mixed
-     */
-    public function validateAddress(mixed $address = null): mixed
-    {
-        if ($address !== null) {
-            // Use the ship-from address
-            if (is_string($address) && str_contains(strtolower($address), 'from') && !empty($this->shipFrom)) {
-                $address = $this->shipFrom;
-                // Else, check that the address is an array of address data
-            } else if (!is_array($address)) {
-                throw new Exception('Error: The provided address must be an array of address data.');
-            }
-        } else if (!empty($this->shipTo)) {
-            $address = $this->shipTo;
-        }
-
-        if (empty($address) && empty($this->shipTo) && empty($this->shipFrom)) {
-            throw new Exception('Error: There is no ship-to or ship-from address and no other address was provided.');
-        }
-
-        /**
-         * TO-DO
-         */
-
-        return $this;
     }
 
 }

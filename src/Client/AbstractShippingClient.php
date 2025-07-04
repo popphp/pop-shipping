@@ -13,7 +13,7 @@
  */
 namespace Pop\Shipping\Client;
 
-use Pop\Http;
+use Pop\Http\Client;
 
 /**
  * Pop shipping client abstract class
@@ -40,9 +40,9 @@ abstract class AbstractShippingClient implements ShippingClientInterface
 
     /**
      * HTTP client
-     * @var ?Http\Client
+     * @var ?Client
      */
-    protected ?Http\Client $client = null;
+    protected ?Client $client = null;
 
     /**
      * Is production flag
@@ -67,7 +67,7 @@ abstract class AbstractShippingClient implements ShippingClientInterface
      *
      * Instantiate the shipping auth object
      */
-    public function __construct(?Http\Client $client = null)
+    public function __construct(?Client $client = null)
     {
         if ($client !== null) {
             $this->setClient($client);
@@ -77,10 +77,10 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     /**
      * Set the HTTP client
      *
-     * @param  Http\Client $client
+     * @param  Client $client
      * @return AbstractShippingClient
      */
-    public function setClient(Http\Client $client): AbstractShippingClient
+    public function setClient(Client $client): AbstractShippingClient
     {
         $this->client = $client;
         return $this;
@@ -89,9 +89,9 @@ abstract class AbstractShippingClient implements ShippingClientInterface
     /**
      * Get the HTTP client
      *
-     * @return ?Http\Client
+     * @return ?Client
      */
-    public function getClient(): ?Http\Client
+    public function getClient(): ?Client
     {
         return $this->client;
     }
