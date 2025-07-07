@@ -47,13 +47,17 @@ Create Auth Client
 ### FedEx
 
 ```php
-$authClient = Pop\Shipping\Auth\Fedex::createAuthClient('CLIENT_ID', 'SECRET', 'ACCOUNT_ID');
+$authClient = Pop\Shipping\Auth\Fedex::createAuthClient(
+    'CLIENT_ID', 'SECRET', 'ACCOUNT_ID'
+);
 ```
 
 ### UPS
 
 ```php
-$authClient = Pop\Shipping\Auth\Fedex::createAuthClient('CLIENT_ID', 'SECRET', 'ACCOUNT_ID');
+$authClient = Pop\Shipping\Auth\Fedex::createAuthClient(
+    'CLIENT_ID', 'SECRET', 'ACCOUNT_ID'
+    );
 ```
 
 #### Authenticate and store token
