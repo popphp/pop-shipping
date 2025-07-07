@@ -448,7 +448,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      */
     public function setShipFrom(array|Address $shipFrom): AbstractAdapter
     {
-        $this->shipTo = !($shipFrom instanceof Address) ? new Address($shipFrom) : $shipFrom;
+        $this->shipFrom = !($shipFrom instanceof Address) ? new Address($shipFrom) : $shipFrom;
         return $this;
     }
 

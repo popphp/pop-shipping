@@ -88,7 +88,7 @@ class Usps extends AbstractAdapter
                     'width'                    => $package->getWidth(),
                     'height'                   => $package->getHeight(),
                     'mailClass'                => 'ALL',
-                    'packageValue'             => $package->getValue()
+                    'packageValue'             => $package->getValue() ?? 1
                 ],
                 'shippingFilter' => 'PRICE'
             ];

@@ -250,9 +250,9 @@ class Google
      *
      * @param  array|Address|null $address
      * @throws Exception
-     * @return void
+     * @return bool
      */
-    public function validate(array|Address|null $address = null): void
+    public function validate(array|Address|null $address = null): bool
     {
         if ($address !== null) {
             $this->setOriginalAddress($address);
@@ -308,6 +308,8 @@ class Google
                 }
             }
         }
+
+        return $this->isConfirmed();
     }
 
     /**

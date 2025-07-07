@@ -296,6 +296,8 @@ class Ups extends AbstractAdapter
                             }
 
                             usort($results[$shipment['inquiryNumber']], fn($a, $b) => $a['dateTime'] <=> $b['dateTime']);
+                        } else if (isset($shipment['warnings'][0]['message'])) {
+                            $results[$shipment['inquiryNumber']] = $shipment['warnings'][0]['message'];
                         }
                     }
                 }

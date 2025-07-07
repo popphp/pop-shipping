@@ -59,11 +59,21 @@ class Address implements \ArrayAccess
         $this->data['address1']    = $address['address1'] ?? null;
         $this->data['address2']    = $address['address2'] ?? null;
         $this->data['city']        = $address['city'] ?? null;
-        $this->data['state']       = $address['state'] ?? null;
-        $this->data['postal_code'] = $address['postal_code'] ?? null;
         $this->data['country']     = $address['country'] ?? null;
         $this->data['phone']       = $address['phone'] ?? null;
         $this->data['residential'] = $address['residential'] ?? false;
+
+        if (isset($address['province'])) {
+            $this->data['state'] = $address['province'];
+        } else if (isset($address['postal_code'])) {
+            $this->data['state'] = $address['state'];
+        }
+
+        if (isset($address['zip'])) {
+            $this->data['postal_code'] = $address['zip'];
+        } else if (isset($address['postal_code'])) {
+            $this->data['postal_code'] = $address['postal_code'];
+        }
     }
 
     /**
@@ -427,6 +437,12 @@ class Address implements \ArrayAccess
      */
     public function __set(string $name, mixed $value)
     {
+        if ($name == 'zip') {
+            $name = 'postal_code';
+        } else if ($name == 'province') {
+            $name = 'state';
+        }
+
         if (array_key_exists($name, $this->data)) {
             $this->data[$name] = $value;
         }
@@ -440,6 +456,11 @@ class Address implements \ArrayAccess
      */
     public function __get(string $name): mixed
     {
+        if ($name == 'zip') {
+            $name = 'postal_code';
+        } else if ($name == 'province') {
+            $name = 'state';
+        }
         return $this->data[$name] ?? null;
     }
 
@@ -451,6 +472,12 @@ class Address implements \ArrayAccess
      */
     public function __isset(string $name): bool
     {
+        if ($name == 'zip') {
+            $name = 'postal_code';
+        } else if ($name == 'province') {
+            $name = 'state';
+        }
+
         return !empty($this->data[$name]);
     }
 
@@ -462,6 +489,12 @@ class Address implements \ArrayAccess
      */
     public function __unset(string $name): void
     {
+        if ($name == 'zip') {
+            $name = 'postal_code';
+        } else if ($name == 'province') {
+            $name = 'state';
+        }
+
         if (array_key_exists($name, $this->data)) {
             $this->data[$name] = null;
         }
