@@ -16,8 +16,8 @@ Overview
 Pop Shipping is a helpful component to manage different shipping APIs from common shipping providers.
 With it, you can get shipping rates as well as track packages. Currently, the supported shipping providers are:
 
-- UPS
 - FedEx
+- UPS
 
 Also, it provides address validation through the Google Maps API.
 
