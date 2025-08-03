@@ -65,7 +65,7 @@ class Address implements \ArrayAccess
 
         if (isset($address['province'])) {
             $this->data['state'] = $address['province'];
-        } else if (isset($address['postal_code'])) {
+        } else if (isset($address['state'])) {
             $this->data['state'] = $address['state'];
         }
 
