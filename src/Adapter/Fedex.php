@@ -162,6 +162,7 @@ class Fedex extends AbstractAdapter
             foreach ($this->response['output']['rateReplyDetails'] as $rateReplyDetail) {
                 if (!empty($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'])) {
                     $results[] = [
+                        'service'     => 'Fedex',
                         'serviceType' => $rateReplyDetail['serviceType'],
                         'serviceName' => $rateReplyDetail['serviceName'],
                         'totalCharge' => number_format($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'], 2)

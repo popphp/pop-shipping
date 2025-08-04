@@ -210,6 +210,7 @@ class Ups extends AbstractAdapter
             isset($this->response['RateResponse']) && isset($this->response['RateResponse']['RatedShipment'])) {
             foreach ($this->response['RateResponse']['RatedShipment'] as $ratedShipment) {
                 $results[] = [
+                    'service'     => 'Fedex',
                     'serviceType' => $ratedShipment['Service']['Code'],
                     'serviceName' => $this->shippingServices[$ratedShipment['Service']['Code']] ?? null,
                     'totalCharge' => number_format($ratedShipment['TotalCharges']['MonetaryValue'], 2)
