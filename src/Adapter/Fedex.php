@@ -165,7 +165,7 @@ class Fedex extends AbstractAdapter
                         'service'     => 'Fedex',
                         'serviceType' => $rateReplyDetail['serviceType'],
                         'serviceName' => $rateReplyDetail['serviceName'],
-                        'totalCharge' => number_format($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'], 2)
+                        'totalCharge' => number_format($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'], 2, '.', '')
                     ];
                 }
             }

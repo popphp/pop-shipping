@@ -213,7 +213,7 @@ class Ups extends AbstractAdapter
                     'service'     => 'UPS',
                     'serviceType' => $ratedShipment['Service']['Code'],
                     'serviceName' => $this->shippingServices[$ratedShipment['Service']['Code']] ?? null,
-                    'totalCharge' => number_format($ratedShipment['TotalCharges']['MonetaryValue'], 2)
+                    'totalCharge' => number_format($ratedShipment['TotalCharges']['MonetaryValue'], 2, '.', '')
                 ];
             }
 
