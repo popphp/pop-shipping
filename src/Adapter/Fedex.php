@@ -53,12 +53,12 @@ class Fedex extends AbstractAdapter
     protected ?string $trackingApiUrl = '/track/v1/trackingnumbers'; // POST
 
     /**
-     * Get rates
+     * Fetch rates from the API
      *
      * @throws Exception
      * @return array
      */
-    public function getRates(): array
+    public function fetchRates(): array
     {
         if (!$this->hasClient()) {
             throw new Exception('Error: There is no HTTP client for this shipping adapter.');
@@ -143,6 +143,19 @@ class Fedex extends AbstractAdapter
 
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
+        } else {
+            $this->errorCode = $response->getCode();
+            $parsedResponse  = $response->getParsedResponse();
+            if (is_string($parsedResponse)) {
+                $parsedResponse = json_decode($parsedResponse, true);
+            }
+            if (isset($parsedResponse['errors'])) {
+                $errorMessages = [];
+                foreach ($parsedResponse['errors'] as $error) {
+                    $errorMessages[] = $error['message'] . ' (' . $error['code'] . ')';
+                }
+                $this->errorMessage = implode('; ', $errorMessages);
+            }
         }
 
         return (!empty($this->response)) ? $this->parseRatesResponse() : [];
@@ -155,13 +168,13 @@ class Fedex extends AbstractAdapter
      */
     public function parseRatesResponse(): array
     {
-        $results = [];
+        $this->rates = [];
 
         if (!empty($this->response) && is_array($this->response) &&
             isset($this->response['output']) && isset($this->response['output']['rateReplyDetails'])) {
             foreach ($this->response['output']['rateReplyDetails'] as $rateReplyDetail) {
                 if (!empty($rateReplyDetail['ratedShipmentDetails'][0]['totalNetCharge'])) {
-                    $results[] = [
+                    $this->rates[] = [
                         'service'     => 'Fedex',
                         'serviceType' => $rateReplyDetail['serviceType'],
                         'serviceName' => $rateReplyDetail['serviceName'],
@@ -170,10 +183,10 @@ class Fedex extends AbstractAdapter
                 }
             }
 
-            usort($results, fn($a, $b) => $a['totalCharge'] <=> $b['totalCharge']);
+            usort($this->rates, fn($a, $b) => $a['totalCharge'] <=> $b['totalCharge']);
         }
 
-        return $results;
+        return $this->rates;
     }
 
     /**

@@ -299,13 +299,83 @@ class Shipping
     }
 
     /**
-     * Get rates
+     * Is success
+     *
+     * @return bool
+     */
+    public function isSuccess(): bool
+    {
+        return $this->adapter?->isSuccess();
+    }
+
+    /**
+     * Get error code
      *
      * @return mixed
      */
-    public function getRates(): mixed
+    public function getErrorCode(): mixed
+    {
+        return $this->adapter?->getErrorCode();
+    }
+
+    /**
+     * Has error code
+     *
+     * @return bool
+     */
+    public function hasErrorCode(): bool
+    {
+        return $this->adapter?->hasErrorCode();
+    }
+
+    /**
+     * Get error message
+     *
+     * @return mixed
+     */
+    public function getErrorMessage(): mixed
+    {
+        return $this->adapter?->getErrorMessage();
+    }
+
+    /**
+     * Has error message
+     *
+     * @return bool
+     */
+    public function hasErrorMessage(): bool
+    {
+        return $this->adapter?->hasErrorMessage();
+    }
+
+    /**
+     * Get rates
+     *
+     * @return array
+     */
+    public function getRates(): array
     {
         return $this->adapter?->getRates();
+    }
+
+    /**
+     * Has rates
+     *
+     * @return bool
+     */
+    public function hasRates(): bool
+    {
+        return $this->adapter?->hasRates();
+    }
+
+    /**
+     * Fetch rates
+     *
+     * @return mixed
+     */
+    public function fetchRates(): mixed
+    {
+        return $this->adapter?->fetchRates();
     }
 
     /**

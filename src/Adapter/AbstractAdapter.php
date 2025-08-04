@@ -95,6 +95,24 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     protected mixed $response = null;
 
     /**
+     * Rates
+     * @var array
+     */
+    protected array $rates = [];
+
+    /**
+     * API error code
+     * @var mixed
+     */
+    protected mixed $errorCode = null;
+
+    /**
+     * API error message
+     * @var mixed
+     */
+    protected mixed $errorMessage = null;
+
+    /**
      * Create shipping adapter
      *
      * @param  AbstractAuthClient $authClient
@@ -493,11 +511,81 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     }
 
     /**
+     * Is success
+     *
+     * @return bool
+     */
+    public function isSuccess(): bool
+    {
+        return (!empty($this->rates) && empty($this->errorCode));
+    }
+
+    /**
+     * Get error code
+     *
+     * @return mixed
+     */
+    public function getErrorCode(): mixed
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * Has error code
+     *
+     * @return bool
+     */
+    public function hasErrorCode(): bool
+    {
+        return (!empty($this->errorCode));
+    }
+
+    /**
+     * Get error message
+     *
+     * @return mixed
+     */
+    public function getErrorMessage(): mixed
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * Has error message
+     *
+     * @return bool
+     */
+    public function hasErrorMessage(): bool
+    {
+        return (!empty($this->errorMessage));
+    }
+
+    /**
      * Get rates
      *
      * @return array
      */
-    abstract public function getRates(): array;
+    public function getRates(): array
+    {
+        return $this->rates;
+    }
+
+    /**
+     * Has rates
+     *
+     * @return bool
+     */
+    public function hasRates(): bool
+    {
+        return (!empty($this->rates));
+    }
+
+    /**
+     * Fetch rates from the API
+     *
+     * @return array
+     */
+    abstract public function fetchRates(): array;
 
     /**
      * Parse rates response

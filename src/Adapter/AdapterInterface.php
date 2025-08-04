@@ -231,11 +231,60 @@ interface AdapterInterface
     public function hasResponse(): bool;
 
     /**
+     * Is success
+     *
+     * @return bool
+     */
+    public function isSuccess(): bool;
+
+    /**
+     * Get error code
+     *
+     * @return mixed
+     */
+    public function getErrorCode(): mixed;
+
+    /**
+     * Has error code
+     *
+     * @return bool
+     */
+    public function hasErrorCode(): bool;
+
+    /**
+     * Get error message
+     *
+     * @return mixed
+     */
+    public function getErrorMessage(): mixed;
+
+    /**
+     * Has error message
+     *
+     * @return bool
+     */
+    public function hasErrorMessage(): bool;
+
+    /**
      * Get rates
      *
      * @return array
      */
     public function getRates(): array;
+
+    /**
+     * Has rates
+     *
+     * @return bool
+     */
+    public function hasRates(): bool;
+
+    /**
+     * Fetch rates from the API
+     *
+     * @return array
+     */
+    public function fetchRates(): array;
 
     /**
      * Parse rates response
