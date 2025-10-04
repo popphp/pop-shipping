@@ -20,7 +20,7 @@
         "popphp/pop-http": "^5.3.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.5.0"
+        "phpunit/phpunit": "^12.0.0"
     },
     "autoload": {
         "psr-4": {
