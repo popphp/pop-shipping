@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2.0",
+        "php": ">=8.3.0",
         "popphp/pop-http": "^5.3.3"
     },
     "require-dev": {
