@@ -90,6 +90,8 @@ class GoogleTest extends TestCase
 
         $this->assertFalse($confirmed);
         $this->assertNotNull($google->getSuggestedAddress());
+        $this->assertEquals('123 Main St', $google->getSuggestedAddress()->getAddress1());
+        $this->assertEquals('Some Town', $google->getSuggestedAddress()->getCity());
         $this->assertEquals('12345-6789', $google->getSuggestedAddress()->getPostalCode());
     }
 
@@ -119,6 +121,8 @@ class GoogleTest extends TestCase
 
         $this->assertFalse($confirmed);
         $this->assertNotNull($google->getSuggestedAddress());
+        $this->assertEquals('123 Main St', $google->getSuggestedAddress()->getAddress1());
+        $this->assertEquals('Some Town', $google->getSuggestedAddress()->getCity());
     }
 
 }
