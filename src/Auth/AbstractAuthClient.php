@@ -205,8 +205,8 @@ abstract class AbstractAuthClient extends AbstractShippingClient implements Auth
             $this->loadTokenData($tokenData);
         }
         file_put_contents($tokenFile, json_encode([
-            'access_token' => $this->tokenData['access_token'],
-            'token_type'   => $this->tokenData['token_type'],
+            'access_token' => $this->tokenData['access_token'] ?? null,
+            'token_type'   => $this->tokenData['token_type'] ?? null,
             'expiration'   => $this->expiration
         ], JSON_PRETTY_PRINT));
 

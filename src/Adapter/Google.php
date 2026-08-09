@@ -287,24 +287,36 @@ class Google
         if ($response->isSuccess()) {
             $this->response = $response->getParsedResponse();
             if (isset($this->response['result']['verdict']) && isset($this->response['result']['verdict']['possibleNextAction'])) {
-                if ($this->response['result']['verdict']['possibleNextAction'] == 'CONFIRM') {
-                    $addressString = ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['firstAddressLine']));
-                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['city'])) {
-                        $addressString .= ', ' . ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['city']));
-                    }
-                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['state'])) {
-                        $addressString .= ', ' . $this->response['result']['uspsData']['standardizedAddress']['state'];
-                    }
-                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCode'])) {
-                        $addressString .= ' ' . $this->response['result']['uspsData']['standardizedAddress']['zipCode'];
-                    }
-                    if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'])) {
-                        $addressString .= '-' . $this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'];
-                    }
+                switch ($this->response['result']['verdict']['possibleNextAction']) {
+                    // A standardized/corrected address exists and differs from the input -
+                    // ask the caller to confirm it via the suggested address.
+                    case 'CONFIRM':
+                    case 'CONFIRM_ADD_SUBPREMISES':
+                        $addressString = ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['firstAddressLine']));
+                        if (!empty($this->response['result']['uspsData']['standardizedAddress']['city'])) {
+                            $addressString .= ', ' . ucwords(strtolower($this->response['result']['uspsData']['standardizedAddress']['city']));
+                        }
+                        if (!empty($this->response['result']['uspsData']['standardizedAddress']['state'])) {
+                            $addressString .= ', ' . $this->response['result']['uspsData']['standardizedAddress']['state'];
+                        }
+                        if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCode'])) {
+                            $addressString .= ' ' . $this->response['result']['uspsData']['standardizedAddress']['zipCode'];
+                        }
+                        if (!empty($this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'])) {
+                            $addressString .= '-' . $this->response['result']['uspsData']['standardizedAddress']['zipCodeExtension'];
+                        }
 
-                    $this->setSuggestedAddress($this->parseAddress($addressString));
-                } else {
-                    $this->confirmed = true;
+                        $this->setSuggestedAddress($this->parseAddress($addressString));
+                        break;
+                    // The address is valid as given - nothing to confirm or suggest.
+                    case 'ACCEPT':
+                        $this->confirmed = true;
+                        break;
+                    // 'FIX' (and any other/unknown value) means the address has unresolved
+                    // issues that a caller must correct themselves - it is neither confirmed
+                    // nor does Google provide a reliable standardized replacement for it.
+                    default:
+                        break;
                 }
             }
         }
@@ -323,12 +335,12 @@ class Google
         $parser = new Address\AddressParser();
         $parser->parse($address);
 
-        $address1 = trim($parser->getStreetNumber()) . ' ' .
-            (($parser->hasRouteType()) ? trim($parser->getStreetName()) . ' ' .
-            trim($parser->getRouteType()) : trim($parser->getStreetName()));
+        $address1 = trim((string)$parser->getStreetNumber()) . ' ' .
+            (($parser->hasRouteType()) ? trim((string)$parser->getStreetName()) . ' ' .
+            trim((string)$parser->getRouteType()) : trim((string)$parser->getStreetName()));
 
-        $postalCode = trim($parser->getPostalCode());
-        $zip4       = trim($parser->getZip4());
+        $postalCode = trim((string)$parser->getPostalCode());
+        $zip4       = trim((string)$parser->getZip4());
 
         if (!empty($zip4)) {
             $postalCode .= '-' . $zip4;
@@ -336,9 +348,9 @@ class Google
 
         return array_filter([
             'address1'      => $address1,
-            'address2' => trim($parser->getUnit()),
-            'state'         => trim($parser->getStateCode()),
-            'city'          => trim($parser->getCity()),
+            'address2' => trim((string)$parser->getUnit()),
+            'state'         => trim((string)$parser->getStateCode()),
+            'city'          => trim((string)$parser->getCity()),
             'postal_code'   => $postalCode,
         ]);
     }

@@ -261,10 +261,10 @@ class Ups extends AbstractAdapter
         $transSource = $this->authClient->isProduction() ? $this->userAgent : 'testing';
 
         $this->client->reset();
-        $this->client->addHeader('transId', uniqid())
-            ->addHeader('transactionSrc', $transSource);
+        $this->client->addHeader('transactionSrc', $transSource);
 
         foreach ($this->trackingNumbers as $trackingNumber) {
+            $this->client->addHeader('transId', uniqid());
             $response = $this->client->get($this->trackingApiUrl . $trackingNumber);
             if ($response->isSuccess()) {
                 $responses[] = $response->getParsedResponse();

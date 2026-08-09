@@ -90,6 +90,7 @@ abstract class AbstractParser implements ParserInterface
     public function setData(mixed $data): static
     {
         $this->data = $data;
+        return $this;
     }
 
     /**
