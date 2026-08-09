@@ -14,6 +14,7 @@
 namespace Pop\Shipping\Adapter;
 
 use Pop\Http\Client;
+use Pop\Parser\Address\AddressParser;
 use Pop\Shipping\Address;
 
 /**
@@ -332,12 +333,12 @@ class Google
      */
     protected function parseAddress(string $address): array
     {
-        $parser = new Address\AddressParser();
+        $parser = new AddressParser();
         $parser->parse($address);
 
         $address1 = trim((string)$parser->getStreetNumber()) . ' ' .
-            (($parser->hasRouteType()) ? trim((string)$parser->getStreetName()) . ' ' .
-            trim((string)$parser->getRouteType()) : trim((string)$parser->getStreetName()));
+            (($parser->hasRouteType()) ? trim((string)$parser->getStreetName(false)) . ' ' .
+            trim((string)$parser->getRouteType()) : trim((string)$parser->getStreetName(false)));
 
         $postalCode = trim((string)$parser->getPostalCode());
         $zip4       = trim((string)$parser->getZip4());
