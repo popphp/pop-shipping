@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -25,9 +25,9 @@ use Pop\Shipping\Package;
  * @category   Pop
  * @package    Pop\AbstractAdapter
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    3.0.0
+ * @version    4.0.0
  */
 abstract class AbstractAdapter extends AbstractShippingClient implements AdapterInterface
 {
@@ -54,7 +54,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
      * User-Agent
      * @var string
      */
-    protected string $userAgent = 'popphp/pop-shipping 3.0.0';
+    protected string $userAgent = 'popphp/pop-shipping 4.0.0';
 
     /**
      * Ship type (Drop-off, Pick-up, etc.)

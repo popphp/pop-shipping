@@ -154,4 +154,99 @@ class GoogleTest extends TestCase
         $this->assertEquals('PO Box 1234', $google->getSuggestedAddress()->getAddress1());
     }
 
+    public function testValidateThrowsWithoutAnOriginalAddress()
+    {
+        $google = new Google('FAKE_KEY');
+
+        $this->expectException(\Pop\Shipping\Adapter\Exception::class);
+        $this->expectExceptionMessage('Error: No original address was provided.');
+
+        $google->validate();
+    }
+
+    public function testValidateThrowsWithoutAPostalCode()
+    {
+        $google = new Google('FAKE_KEY');
+
+        $this->expectException(\Pop\Shipping\Adapter\Exception::class);
+        $this->expectExceptionMessage('Error: The original address postal code is required.');
+
+        $google->validate(['address1' => '123 Main St', 'city' => 'Some Town', 'state' => 'FL']);
+    }
+
+    public function testValidateWithMalformedResponseStaysUnconfirmedWithNoException()
+    {
+        $google = new Google('FAKE_KEY');
+        $mock   = new Mock();
+        $mock->queue($this->jsonResponse(['result' => []]));
+        $google->getClient()->setHandler($mock);
+
+        $confirmed = $google->validate(['address1' => '123 Main St', 'postal_code' => '12345']);
+
+        $this->assertFalse($confirmed);
+        $this->assertNull($google->getSuggestedAddress());
+    }
+
+    public function testApiKeyAccessors()
+    {
+        $google = new Google('FAKE_KEY');
+        $this->assertTrue($google->hasApiKey());
+        $this->assertEquals('FAKE_KEY', $google->getApiKey());
+
+        $google->setApiKey('OTHER_KEY');
+        $this->assertEquals('OTHER_KEY', $google->getApiKey());
+    }
+
+    public function testClientAccessors()
+    {
+        $google = new Google('FAKE_KEY');
+        $this->assertTrue($google->hasClient());
+        $this->assertNotNull($google->getClient());
+    }
+
+    public function testGetApiUrl()
+    {
+        $google = new Google('FAKE_KEY');
+        $this->assertEquals('https://addressvalidation.googleapis.com/v1:validateAddress?key=', $google->getApiUrl());
+    }
+
+    public function testValidateIncludesAddress2InRequestWhenPresent()
+    {
+        $google = new Google('FAKE_KEY');
+        $mock   = new Mock();
+        $mock->queue($this->jsonResponse(['result' => ['verdict' => ['possibleNextAction' => 'ACCEPT']]]));
+        $google->getClient()->setHandler($mock);
+
+        $google->validate([
+            'address1'    => '123 Main St',
+            'address2'    => 'Apt 4',
+            'postal_code' => '12345',
+        ]);
+
+        $data = json_decode($mock->getLastRequest()->getDataContent(), true);
+        $this->assertEquals(['123 Main St', 'Apt 4'], $data['address']['addressLines']);
+    }
+
+    public function testOriginalAndSuggestedAddressAccessorsDefaultEmpty()
+    {
+        $google = new Google('FAKE_KEY');
+        $this->assertFalse($google->hasOriginalAddress());
+        $this->assertNull($google->getOriginalAddress());
+        $this->assertFalse($google->hasSuggestedAddress());
+        $this->assertNull($google->getSuggestedAddress());
+        $this->assertFalse($google->isConfirmed());
+        $this->assertEquals([], $google->getResponse());
+    }
+
+    public function testSetOriginalAddressAcceptsAddressInstance()
+    {
+        $google  = new Google('FAKE_KEY');
+        $address = new \Pop\Shipping\Address(['postal_code' => '12345']);
+
+        $google->setOriginalAddress($address);
+
+        $this->assertTrue($google->hasOriginalAddress());
+        $this->assertSame($address, $google->getOriginalAddress());
+    }
+
 }

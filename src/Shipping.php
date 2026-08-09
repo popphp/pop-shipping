@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Shipping;
  * @category   Pop
  * @package    Pop\Shipping
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    3.0.0
+ * @version    4.0.0
  */
 class Shipping
 {
@@ -76,9 +76,9 @@ class Shipping
     /**
      * Get shipping adapter
      *
-     * @return Adapter\AbstractAdapter
+     * @return ?Adapter\AbstractAdapter
      */
-    public function getAdapter(): Adapter\AbstractAdapter
+    public function getAdapter(): ?Adapter\AbstractAdapter
     {
         return $this->adapter;
     }
@@ -120,9 +120,9 @@ class Shipping
     /**
      * Get shipping packages
      *
-     * @return array
+     * @return ?array
      */
-    public function getPackages(): array
+    public function getPackages(): ?array
     {
         return $this->adapter?->getPackages();
     }
@@ -141,9 +141,9 @@ class Shipping
     /**
      * Has shipping packages
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasPackages(): bool
+    public function hasPackages(): ?bool
     {
         return $this->adapter?->hasPackages();
     }
@@ -152,9 +152,9 @@ class Shipping
      * Has shipping package
      *
      * @param  mixed $id
-     * @return bool
+     * @return ?bool
      */
-    public function hasPackage(mixed $id): bool
+    public function hasPackage(mixed $id): ?bool
     {
         return $this->adapter?->hasPackage($id);
     }
@@ -186,9 +186,9 @@ class Shipping
     /**
      * Get shipping packages
      *
-     * @return array
+     * @return ?array
      */
-    public function getTrackingNumbers(): array
+    public function getTrackingNumbers(): ?array
     {
         return $this->adapter?->getTrackingNumbers();
     }
@@ -196,9 +196,9 @@ class Shipping
     /**
      * Has shipping tracking numbers
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasTrackingNumbers(): bool
+    public function hasTrackingNumbers(): ?bool
     {
         return $this->adapter?->hasTrackingNumbers();
     }
@@ -207,9 +207,9 @@ class Shipping
      * Has shipping tracking number
      *
      * @param  string $trackingNumber
-     * @return bool
+     * @return ?bool
      */
-    public function hasTrackingNumber(string $trackingNumber): bool
+    public function hasTrackingNumber(string $trackingNumber): ?bool
     {
         return $this->adapter?->hasTrackingNumber($trackingNumber);
     }
@@ -229,9 +229,9 @@ class Shipping
     /**
      * Get ship to
      *
-     * @return Address
+     * @return ?Address
      */
-    public function getShipTo(): Address
+    public function getShipTo(): ?Address
     {
         return $this->adapter?->getShipTo();
     }
@@ -239,9 +239,9 @@ class Shipping
     /**
      * Has ship to
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasShipTo(): bool
+    public function hasShipTo(): ?bool
     {
         return $this->adapter?->hasShipTo();
     }
@@ -261,9 +261,9 @@ class Shipping
     /**
      * Get ship from
      *
-     * @return Address
+     * @return ?Address
      */
-    public function getShipFrom(): Address
+    public function getShipFrom(): ?Address
     {
         return $this->adapter?->getShipFrom();
     }
@@ -271,9 +271,9 @@ class Shipping
     /**
      * Has ship from
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasShipFrom(): bool
+    public function hasShipFrom(): ?bool
     {
         return $this->adapter?->hasShipFrom();
     }
@@ -291,9 +291,9 @@ class Shipping
     /**
      * Has response
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasResponse(): bool
+    public function hasResponse(): ?bool
     {
         return $this->adapter?->hasResponse();
     }
@@ -301,9 +301,9 @@ class Shipping
     /**
      * Is success
      *
-     * @return bool
+     * @return ?bool
      */
-    public function isSuccess(): bool
+    public function isSuccess(): ?bool
     {
         return $this->adapter?->isSuccess();
     }
@@ -321,9 +321,9 @@ class Shipping
     /**
      * Has error code
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasErrorCode(): bool
+    public function hasErrorCode(): ?bool
     {
         return $this->adapter?->hasErrorCode();
     }
@@ -341,9 +341,9 @@ class Shipping
     /**
      * Has error message
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasErrorMessage(): bool
+    public function hasErrorMessage(): ?bool
     {
         return $this->adapter?->hasErrorMessage();
     }
@@ -351,9 +351,9 @@ class Shipping
     /**
      * Get rates
      *
-     * @return array
+     * @return ?array
      */
-    public function getRates(): array
+    public function getRates(): ?array
     {
         return $this->adapter?->getRates();
     }
@@ -361,9 +361,9 @@ class Shipping
     /**
      * Has rates
      *
-     * @return bool
+     * @return ?bool
      */
-    public function hasRates(): bool
+    public function hasRates(): ?bool
     {
         return $this->adapter?->hasRates();
     }
