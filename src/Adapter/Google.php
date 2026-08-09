@@ -336,9 +336,9 @@ class Google
         $parser = new AddressParser();
         $parser->parse($address);
 
-        $address1 = trim((string)$parser->getStreetNumber()) . ' ' .
-            (($parser->hasRouteType()) ? trim((string)$parser->getStreetName(false)) . ' ' .
-            trim((string)$parser->getRouteType()) : trim((string)$parser->getStreetName(false)));
+        $address1 = trim(trim((string)$parser->getStreetNumber()) . ' ' .
+            (($parser->hasRouteType()) ? trim((string)$parser->getStreetName()) . ' ' .
+            trim((string)$parser->getRouteType()) : trim((string)$parser->getStreetName())));
 
         $postalCode = trim((string)$parser->getPostalCode());
         $zip4       = trim((string)$parser->getZip4());

@@ -103,7 +103,7 @@ class GoogleTest extends TestCase
             'result' => [
                 'verdict'  => ['possibleNextAction' => 'CONFIRM_ADD_SUBPREMISES'],
                 'uspsData' => ['standardizedAddress' => [
-                    'firstAddressLine' => '123 MAIN ST',
+                    'firstAddressLine' => '123 N MAIN ST',
                     'city'             => 'SOME TOWN',
                     'state'            => 'FL',
                     'zipCode'          => '12345',
@@ -121,8 +121,37 @@ class GoogleTest extends TestCase
 
         $this->assertFalse($confirmed);
         $this->assertNotNull($google->getSuggestedAddress());
-        $this->assertEquals('123 Main St', $google->getSuggestedAddress()->getAddress1());
+        $this->assertEquals('123 N Main St', $google->getSuggestedAddress()->getAddress1());
         $this->assertEquals('Some Town', $google->getSuggestedAddress()->getCity());
+    }
+
+    public function testValidateBuildsSuggestedAddressWithNoLeadingSpaceForPoBox()
+    {
+        $google = new Google('FAKE_KEY');
+        $mock   = new Mock();
+        $mock->queue($this->jsonResponse([
+            'result' => [
+                'verdict'  => ['possibleNextAction' => 'CONFIRM'],
+                'uspsData' => ['standardizedAddress' => [
+                    'firstAddressLine' => 'PO BOX 1234',
+                    'city'             => 'SOME TOWN',
+                    'state'            => 'FL',
+                    'zipCode'          => '12345',
+                ]],
+            ],
+        ]));
+        $google->getClient()->setHandler($mock);
+
+        $confirmed = $google->validate([
+            'address1'    => 'PO Box 1234',
+            'city'        => 'Some Town',
+            'state'       => 'FL',
+            'postal_code' => '12345',
+        ]);
+
+        $this->assertFalse($confirmed);
+        $this->assertNotNull($google->getSuggestedAddress());
+        $this->assertEquals('PO Box 1234', $google->getSuggestedAddress()->getAddress1());
     }
 
 }
