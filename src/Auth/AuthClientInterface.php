@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -165,7 +166,7 @@ interface AuthClientInterface
     /**
      * Get auth token expiration
      *
-     * @return ?string
+     * @return ?int
      */
     public function getExpiration(): ?int;
 

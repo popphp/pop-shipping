@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -289,7 +290,7 @@ interface AdapterInterface
     /**
      * Parse rates response
      *
-     * @return mixed
+     * @return array
      */
     public function parseRatesResponse(): array;
 
@@ -304,7 +305,7 @@ interface AdapterInterface
     /**
      * Parse tracking response
      *
-     * @return mixed
+     * @return array
      */
     public function parseTrackingResponse(): array;
 

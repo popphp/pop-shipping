@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -210,7 +211,7 @@ class Ups extends AbstractAdapter
     /**
      * Parse rates response
      *
-     * @return mixed
+     * @return array
      */
     public function parseRatesResponse(): array
     {
@@ -223,7 +224,7 @@ class Ups extends AbstractAdapter
                     'service'     => 'UPS',
                     'serviceType' => $ratedShipment['Service']['Code'],
                     'serviceName' => $this->shippingServices[$ratedShipment['Service']['Code']] ?? null,
-                    'totalCharge' => number_format($ratedShipment['TotalCharges']['MonetaryValue'], 2, '.', '')
+                    'totalCharge' => number_format((float)$ratedShipment['TotalCharges']['MonetaryValue'], 2, '.', '')
                 ];
             }
 
@@ -282,7 +283,7 @@ class Ups extends AbstractAdapter
     /**
      * Parse tracking response
      *
-     * @return mixed
+     * @return array
      */
     public function parseTrackingResponse(): array
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -82,7 +83,7 @@ class Fedex extends AbstractAdapter
         }
         $shipper['address']['postalCode']  = $this->shipFrom['postal_code'];
         $shipper['address']['countryCode'] = $this->shipFrom['country'] ?? 'US';
-        $shipper['address']['residential'] = (bool)$this->shipFrom['residential'] ?? false;
+        $shipper['address']['residential'] = (bool)$this->shipFrom['residential'];
 
         if (!empty($this->shipTo['address1'])) {
             $recipient['address']['streetLines'] = [$this->shipTo['address1']];
@@ -98,7 +99,7 @@ class Fedex extends AbstractAdapter
         }
         $recipient['address']['postalCode']  = $this->shipTo['postal_code'];
         $recipient['address']['countryCode'] = $this->shipTo['country'] ?? 'US';
-        $recipient['address']['residential'] = (bool)$this->shipTo['residential'] ?? false;
+        $recipient['address']['residential'] = (bool)$this->shipTo['residential'];
 
         foreach ($this->packages as $package) {
             $pkg = [
@@ -164,7 +165,7 @@ class Fedex extends AbstractAdapter
     /**
      * Parse rates response
      *
-     * @return mixed
+     * @return array
      */
     public function parseRatesResponse(): array
     {
@@ -245,7 +246,7 @@ class Fedex extends AbstractAdapter
     /**
      * Parse tracking response
      *
-     * @return mixed
+     * @return array
      */
     public function parseTrackingResponse(): array
     {

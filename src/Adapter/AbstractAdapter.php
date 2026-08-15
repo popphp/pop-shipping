@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -590,7 +591,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Parse rates response
      *
-     * @return mixed
+     * @return array
      */
     abstract public function parseRatesResponse(): array;
 
@@ -605,7 +606,7 @@ abstract class AbstractAdapter extends AbstractShippingClient implements Adapter
     /**
      * Parse tracking response
      *
-     * @return mixed
+     * @return array
      */
     abstract public function parseTrackingResponse(): array;
 
