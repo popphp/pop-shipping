@@ -3,6 +3,6 @@ parameters:
     paths:
         - src
     stubFiles:
-        - stubs/PopHttpClient.stub.php
+        - .phpstan/stubs/PopHttpClient.stub.php
     ignoreErrors:
         - identifier: new.static
