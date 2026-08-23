@@ -264,4 +264,3 @@ happened, and only `hasSuggestedAddress()` tells them apart:
 The address can also be passed directly to `validate($address)` instead of calling `setOriginalAddress()` first.
 
 [Top](#pop-shipping)
-
